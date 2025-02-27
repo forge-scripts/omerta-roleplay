@@ -5,6 +5,7 @@ const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whiteli
 // If using a different port, adjust accordingly
 const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
 const REQUIRED_SCORE = 6; // Out of 7 questions
+const WHITELIST_ROLE_ID = '1344671671377858590';
 
 // Quiz Questions
 const questions = [
@@ -199,6 +200,43 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     if (passed) {
         document.getElementById('success-result').style.display = 'block';
         document.getElementById('fail-result').style.display = 'none';
+        
+        try {
+            // Make API call to your bot's endpoint
+            const response = await fetch('http://localhost:3001/assign-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    passed: true
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to assign role');
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById('success-result').innerHTML = `
+                    <i data-lucide="check-circle"></i>
+                    <h3>Čestitamo!</h3>
+                    <p>Uspješno ste prošli whitelist. Uloga će vam biti dodijeljena automatski.</p>
+                `;
+            } else {
+                throw new Error('Role assignment failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('success-result').innerHTML = `
+                <i data-lucide="check-circle"></i>
+                <h3>Čestitamo!</h3>
+                <p>Uspješno ste prošli whitelist, ali došlo je do greške pri dodjeljivanju uloge.</p>
+                <p class="error-message">Molimo kontaktirajte administratora za dodjelu uloge.</p>
+            `;
+        }
     } else {
         document.getElementById('success-result').style.display = 'none';
         document.getElementById('fail-result').style.display = 'block';
@@ -219,59 +257,6 @@ lucide.createIcons();
 function handleError(error) {
     console.error('Error:', error);
     // Add error handling UI if needed
-}
-
-// Example using Discord.js
-const correctAnswers = new Map(); // Track user answers
-
-client.on('messageCreate', async (message) => {
-    // Ignore bot messages
-    if (message.author.bot) return;
-    
-    // Check if answer is correct
-    if (isCorrectAnswer(message.content)) {
-        // Store correct answer for user
-        if (!correctAnswers.has(message.author.id)) {
-            correctAnswers.set(message.author.id, new Set());
-        }
-        correctAnswers.get(message.author.id).add(getCurrentQuestionNumber());
-        
-        // Check if all questions are answered
-        if (hasAnsweredAllQuestions(message.author.id)) {
-            try {
-                // Get the role using the specific ID
-                const role = message.guild.roles.cache.get('1344671671377858590');
-                
-                if (!role) {
-                    console.error('Role not found');
-                    return;
-                }
-                
-                // Add the role to the user
-                await message.member.roles.add(role);
-                await message.reply('Congratulations! You\'ve completed all questions and received your new role!');
-            } catch (error) {
-                console.error('Error assigning role:', error);
-                await message.reply('There was an error assigning your role. Please contact an administrator.');
-            }
-        }
-    }
-});
-
-function isCorrectAnswer(answer) {
-    // Your logic to check if answer is correct
-    return true; // Replace with actual check
-}
-
-function getCurrentQuestionNumber() {
-    // Your logic to get current question number
-    return 1; // Replace with actual question number
-}
-
-function hasAnsweredAllQuestions(userId) {
-    const userAnswers = correctAnswers.get(userId);
-    const requiredQuestions = 5; // Set this to your total number of questions
-    return userAnswers && userAnswers.size >= requiredQuestions;
 }
 
 // Add click event listener for login button
