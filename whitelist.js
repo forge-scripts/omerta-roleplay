@@ -4,8 +4,8 @@ const DISCORD_REDIRECT_URI = window.location.hostname === 'localhost'
     ? 'http://localhost:5500/whitelist.html'
     : 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const BOT_ENDPOINT = window.location.hostname === 'localhost'
-    ? 'http://localhost:3001'
-    : 'http://localhost:3001'; // When you host the bot, replace this with your hosted bot URL
+    ? 'http://localhost:9990'
+    : 'http://digi.pylex.xyz:9990'; // Updated to your hosted bot URL
 const REQUIRED_SCORE = 6; // Out of 7 questions
 const WHITELIST_ROLE_ID = '1344671671377858590';
 
@@ -88,53 +88,134 @@ let userAnswers = new Array(questions.length).fill(null);
 // Store user ID when logged in
 let currentUserId = null;
 
+// Discord OAuth2 configuration
+const config = {
+    botApiUrl: 'http://localhost:9990',  // Change this to your bot's URL when deployed
+    clientId: '1238809630008938496',
+    redirectUri: 'https://benjy244.github.io/omerta-roleplay/whitelist.html',
+    scope: 'identify guilds'
+};
+
+let userId = null;
+
 // Function to handle Discord login
-function loginWithDiscord() {
-    const params = new URLSearchParams();
-    params.append('client_id', DISCORD_CLIENT_ID);
-    params.append('redirect_uri', DISCORD_REDIRECT_URI);
-    params.append('response_type', 'token');
-    params.append('scope', 'identify');
+async function handleLogin() {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = params.get('access_token');
 
-    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
-    window.location.href = authUrl;
-}
-
-// Wait for DOM to load
-window.addEventListener('load', async () => {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get('access_token');
-    
     if (accessToken) {
         try {
             // Get user info from Discord
-            const userResponse = await fetch('https://discord.com/api/users/@me', {
+            const response = await fetch('https://discord.com/api/users/@me', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
             });
-            const userData = await userResponse.json();
-            currentUserId = userData.id;
-
-            // Start quiz immediately (no cooldown check)
-            startQuiz();
+            const user = await response.json();
+            userId = user.id;
+            
+            // Show quiz section after successful login
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
         } catch (error) {
-            console.error('Error:', error);
-            showError('There was an error authenticating with Discord. Please try again.');
+            console.error('Error fetching user data:', error);
         }
-    } else {
-        // Show login section if no token
-        document.getElementById('login-section').classList.add('active');
     }
-});
-
-// Helper function to show error message
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    document.body.appendChild(errorDiv);
 }
+
+// Function to submit quiz answers
+async function submitQuiz() {
+    if (!userId) {
+        alert('Please login with Discord first');
+        return;
+    }
+
+    // Calculate score
+    const score = userAnswers.reduce((acc, answer, index) => 
+        answer === questions[index].correct ? acc + 1 : acc, 0);
+    
+    const passed = score >= REQUIRED_SCORE;
+
+    try {
+        // Call bot API to assign role
+        const response = await fetch(`${BOT_ENDPOINT}/assign-role`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: userId,
+                passed: passed,
+                score: score
+            })
+        });
+
+        const result = await response.json();
+        console.log('Role assignment response:', result);
+
+        // Hide quiz section
+        document.getElementById('quiz-section').style.display = 'none';
+
+        if (result.success) {
+            // Show success message
+            document.getElementById('success-section').style.display = 'block';
+            document.getElementById('error-section').style.display = 'none';
+        } else {
+            // Show error message
+            document.getElementById('error-section').style.display = 'block';
+            document.getElementById('success-section').style.display = 'none';
+            document.getElementById('error-message').textContent = result.error || 'Failed to assign role';
+        }
+    } catch (error) {
+        console.error('Error assigning role:', error);
+        document.getElementById('quiz-section').style.display = 'none';
+        document.getElementById('error-section').style.display = 'block';
+        document.getElementById('success-section').style.display = 'none';
+        document.getElementById('error-message').textContent = 'Connection error. Please try again.';
+    }
+}
+
+// Function to check cooldown
+async function checkCooldown() {
+    if (!userId) return;
+
+    try {
+        const response = await fetch(`${config.botApiUrl}/check-cooldown`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (result.onCooldown) {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('cooldown-section').style.display = 'block';
+            document.getElementById('cooldown-time').textContent = 
+                `${result.remainingTime.hours}h ${result.remainingTime.minutes}m`;
+        }
+    } catch (error) {
+        console.error('Error checking cooldown:', error);
+    }
+}
+
+// Initialize login handling
+window.onload = () => {
+    handleLogin();
+    
+    // Add click handler for login button
+    document.getElementById('login-button').addEventListener('click', () => {
+        const params = new URLSearchParams({
+            client_id: config.clientId,
+            redirect_uri: config.redirectUri,
+            response_type: 'token',
+            scope: config.scope
+        });
+        
+        window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
+    });
+};
 
 // Update the startQuiz function
 function startQuiz() {
@@ -188,70 +269,6 @@ function handleAnswer(questionIndex, answerIndex) {
     const submitBtn = document.getElementById('submitQuiz');
     submitBtn.disabled = userAnswers.includes(null);
 }
-
-// Update the submit quiz handler
-document.getElementById('submitQuiz')?.addEventListener('click', async () => {
-    const score = userAnswers.reduce((acc, answer, index) => 
-        answer === questions[index].correct ? acc + 1 : acc, 0);
-    
-    const passed = score >= REQUIRED_SCORE;
-    
-    document.getElementById('quiz-section').classList.remove('active');
-    document.getElementById('result-section').classList.add('active');
-    
-    if (passed) {
-        document.getElementById('success-result').style.display = 'block';
-        document.getElementById('fail-result').style.display = 'none';
-        
-        try {
-            // Make API call to your bot's endpoint
-            const response = await fetch(`${BOT_ENDPOINT}/assign-role`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    passed: true
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to assign role');
-            }
-
-            const result = await response.json();
-            if (result.success) {
-                document.getElementById('success-result').innerHTML = `
-                    <i data-lucide="check-circle"></i>
-                    <h3>Čestitamo!</h3>
-                    <p>Uspješno ste prošli whitelist. Uloga će vam biti dodijeljena automatski.</p>
-                `;
-            } else {
-                throw new Error('Role assignment failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('success-result').innerHTML = `
-                <i data-lucide="check-circle"></i>
-                <h3>Čestitamo!</h3>
-                <p>Uspješno ste prošli whitelist, ali došlo je do greške pri dodjeljivanju uloge.</p>
-                <p class="error-message">Molimo kontaktirajte administratora za dodjelu uloge.</p>
-            `;
-        }
-    } else {
-        document.getElementById('success-result').style.display = 'none';
-        document.getElementById('fail-result').style.display = 'block';
-        document.getElementById('fail-result').innerHTML = `
-            <i data-lucide="x-circle"></i>
-            <h3>Pokušajte Ponovno</h3>
-            <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
-        `;
-    }
-    
-    // Initialize icons
-    lucide.createIcons();
-});
 
 // Initialize Lucide icons
 lucide.createIcons();
