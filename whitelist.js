@@ -1,6 +1,6 @@
 // Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496'; // Your Discord Client ID
-const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html'; // For local development server
+const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html'; // Production URL
 // If using Live Server in VS Code, it typically uses port 5500
 // If using a different port, adjust accordingly
 const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
@@ -233,7 +233,7 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     const passed = score >= REQUIRED_SCORE;
     
     try {
-        const response = await fetch('http://localhost:3001/assign-role', {
+        const response = await fetch('https://your-api-domain.com/assign-role', {  // Replace with your actual API domain
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
