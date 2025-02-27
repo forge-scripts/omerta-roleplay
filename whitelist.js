@@ -126,7 +126,7 @@ window.addEventListener('load', async () => {
                 },
                 body: new URLSearchParams({
                     client_id: DISCORD_CLIENT_ID,
-                    client_secret: 'YOUR_CLIENT_SECRET', // You'll need to add this securely
+                    client_secret: 'YOUR_CLIENT_SECRET',
                     grant_type: 'authorization_code',
                     code: code,
                     redirect_uri: DISCORD_REDIRECT_URI
@@ -145,7 +145,10 @@ window.addEventListener('load', async () => {
             const userData = await userResponse.json();
             currentUserId = userData.id;
 
-            // Check cooldown only if user has previously failed
+            // Temporarily skip cooldown check and show quiz to everyone
+            startQuiz();
+
+            /* Commented out cooldown check for now
             const cooldownResponse = await fetch('https://benjy244.github.io/omerta-roleplay/check-cooldown', {
                 method: 'POST',
                 headers: {
@@ -158,8 +161,9 @@ window.addEventListener('load', async () => {
             if (cooldownData.onCooldown) {
                 showCooldownMessage(cooldownData.remainingTime);
             } else {
-                startQuiz(); // Show the quiz if not on cooldown
+                startQuiz();
             }
+            */
         } catch (error) {
             console.error('Error:', error);
             showError('There was an error authenticating with Discord. Please try again.');
