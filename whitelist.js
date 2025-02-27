@@ -90,77 +90,40 @@ function loginWithDiscord() {
     const params = new URLSearchParams();
     params.append('client_id', DISCORD_CLIENT_ID);
     params.append('redirect_uri', DISCORD_REDIRECT_URI);
-    params.append('response_type', 'token'); // Change back to token for implicit flow
-    params.append('scope', 'identify');  // Simplify scopes to just what we need
+    params.append('response_type', 'token');
+    params.append('scope', 'identify');
 
     const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
-    console.log('Auth URL:', authUrl);
-    console.log('Redirect URI:', DISCORD_REDIRECT_URI);
-    
     window.location.href = authUrl;
 }
 
-// Wait for DOM to load and add click event listener
-document.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('discordLoginBtn');
-    if (loginButton) {
-        loginButton.onclick = loginWithDiscord; // Direct assignment of function
-        console.log('Discord login button initialized'); // Debug log
-    } else {
-        console.error('Login button not found'); // Debug log
-    }
-});
-
-// Modify the window load handler for implicit flow
+// Wait for DOM to load
 window.addEventListener('load', async () => {
-    // Check for token in URL hash
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = fragment.get('access_token');
     
     if (accessToken) {
         try {
-            // Get user info using the access token
+            // Get user info from Discord
             const userResponse = await fetch('https://discord.com/api/users/@me', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
             });
-
-            if (!userResponse.ok) {
-                throw new Error('Failed to get user info');
-            }
-
             const userData = await userResponse.json();
             currentUserId = userData.id;
-            console.log('Successfully authenticated user:', currentUserId);
 
-            // Show quiz immediately after successful authentication
+            // Start quiz immediately (no cooldown check)
             startQuiz();
         } catch (error) {
-            console.error('Authentication error:', error);
+            console.error('Error:', error);
             showError('There was an error authenticating with Discord. Please try again.');
-            // Show login section again on error
-            document.getElementById('login-section').classList.add('active');
         }
     } else {
-        // Show login section if no token is present
+        // Show login section if no token
         document.getElementById('login-section').classList.add('active');
-        document.getElementById('quiz-section').classList.remove('active');
-        document.getElementById('cooldown-section').classList.remove('active');
-        document.getElementById('result-section').classList.remove('active');
     }
 });
-
-// Helper function to show cooldown message
-function showCooldownMessage(remainingTime) {
-    document.getElementById('login-section').classList.remove('active');
-    document.getElementById('quiz-section').classList.remove('active');
-    document.getElementById('cooldown-section').classList.add('active');
-    
-    const { hours, minutes } = remainingTime;
-    document.getElementById('cooldown-timer').textContent = 
-        `Preostalo vrijeme: ${hours} sati i ${minutes} minuta`;
-}
 
 // Helper function to show error message
 function showError(message) {
@@ -173,7 +136,6 @@ function showError(message) {
 // Update the startQuiz function
 function startQuiz() {
     document.getElementById('login-section').classList.remove('active');
-    document.getElementById('cooldown-section').classList.remove('active');
     document.getElementById('quiz-section').classList.add('active');
     
     const quizContainer = document.getElementById('quiz-container');
@@ -224,7 +186,7 @@ function handleAnswer(questionIndex, answerIndex) {
     submitBtn.disabled = userAnswers.includes(null);
 }
 
-// Update the submit quiz handler to handle everything client-side
+// Update the submit quiz handler
 document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
@@ -237,8 +199,6 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     if (passed) {
         document.getElementById('success-result').style.display = 'block';
         document.getElementById('fail-result').style.display = 'none';
-        // Initialize Lucide icons for success message
-        lucide.createIcons();
     } else {
         document.getElementById('success-result').style.display = 'none';
         document.getElementById('fail-result').style.display = 'block';
@@ -247,12 +207,10 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
             <h3>Pokušajte Ponovno</h3>
             <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
         `;
-        // Initialize Lucide icons for fail message
-        lucide.createIcons();
     }
-
-    // Log the result to console for debugging
-    console.log(`Quiz completed. Score: ${score}/${questions.length}. Passed: ${passed}`);
+    
+    // Initialize icons
+    lucide.createIcons();
 });
 
 // Initialize Lucide icons
@@ -314,4 +272,12 @@ function hasAnsweredAllQuestions(userId) {
     const userAnswers = correctAnswers.get(userId);
     const requiredQuestions = 5; // Set this to your total number of questions
     return userAnswers && userAnswers.size >= requiredQuestions;
-} 
+}
+
+// Add click event listener for login button
+document.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.getElementById('discordLoginBtn');
+    if (loginButton) {
+        loginButton.onclick = loginWithDiscord;
+    }
+}); 
