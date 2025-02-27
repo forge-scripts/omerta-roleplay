@@ -145,29 +145,18 @@ window.addEventListener('load', async () => {
             const userData = await userResponse.json();
             currentUserId = userData.id;
 
-            // Temporarily skip cooldown check and show quiz to everyone
+            // Always show quiz immediately
             startQuiz();
-
-            /* Commented out cooldown check for now
-            const cooldownResponse = await fetch('https://benjy244.github.io/omerta-roleplay/check-cooldown', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId: currentUserId })
-            });
-            const cooldownData = await cooldownResponse.json();
-
-            if (cooldownData.onCooldown) {
-                showCooldownMessage(cooldownData.remainingTime);
-            } else {
-                startQuiz();
-            }
-            */
         } catch (error) {
             console.error('Error:', error);
             showError('There was an error authenticating with Discord. Please try again.');
         }
+    } else {
+        // Show login section if no code is present
+        document.getElementById('login-section').classList.add('active');
+        document.getElementById('quiz-section').classList.remove('active');
+        document.getElementById('cooldown-section').classList.remove('active');
+        document.getElementById('result-section').classList.remove('active');
     }
 });
 
@@ -244,7 +233,7 @@ function handleAnswer(questionIndex, answerIndex) {
     submitBtn.disabled = userAnswers.includes(null);
 }
 
-// Update your submit quiz handler
+// Update the submit quiz handler to remove cooldown message
 document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
@@ -275,11 +264,11 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
         } else {
             document.getElementById('success-result').style.display = 'none';
             document.getElementById('fail-result').style.display = 'block';
-            // Update fail message to include cooldown
+            // Remove cooldown message from fail result
             document.getElementById('fail-result').innerHTML = `
                 <i data-lucide="x-circle"></i>
                 <h3>Pokušajte Ponovno</h3>
-                <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno za 24 sata.</p>
+                <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
             `;
         }
     } catch (error) {
