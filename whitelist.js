@@ -111,77 +111,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Add this function to check cooldown before starting quiz
-async function checkCooldown() {
-    const fragment = new URLSearchParams(window.location.search); // Changed from hash to search
-    const code = fragment.get('code'); // Changed from access_token to code
-    
-    try {
-        // First get user info from Discord
-        const userResponse = await fetch('https://discord.com/api/users/@me', {
-            headers: {
-                Authorization: `Bearer ${code}`
-            }
-        });
-        const userData = await userResponse.json();
-        currentUserId = userData.id;
-
-        // Then check cooldown
-        const cooldownResponse = await fetch('https://benjy244.github.io/omerta-roleplay/check-cooldown', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId: currentUserId })
-        });
-        const cooldownData = await cooldownResponse.json();
-
-        if (cooldownData.onCooldown) {
-            // Hide other sections
-            document.getElementById('login-section').classList.remove('active');
-            document.getElementById('quiz-section').classList.remove('active');
-            
-            // Show cooldown section
-            document.getElementById('cooldown-section').classList.add('active');
-            
-            // Update cooldown timer text
-            const { hours, minutes } = cooldownData.remainingTime;
-            document.getElementById('cooldown-timer').textContent = 
-                `Preostalo vrijeme: ${hours} sati i ${minutes} minuta`;
-            
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error('Error checking cooldown:', error);
-        return false;
-    }
-}
-
-// Modify your existing login handler
+// Modify the window load handler
 window.addEventListener('load', async () => {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get('access_token');
+    const fragment = new URLSearchParams(window.location.search);
+    const code = fragment.get('code');
     
-    if (accessToken) {
+    if (code) {
         try {
-            const canStart = await checkCooldown();
-            if (canStart) {
-                startQuiz();
+            // Exchange code for access token first
+            const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: DISCORD_CLIENT_ID,
+                    client_secret: 'YOUR_CLIENT_SECRET', // You'll need to add this securely
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: DISCORD_REDIRECT_URI
+                })
+            });
+
+            const tokenData = await tokenResponse.json();
+            const accessToken = tokenData.access_token;
+
+            // Get user info using the access token
+            const userResponse = await fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+            const userData = await userResponse.json();
+            currentUserId = userData.id;
+
+            // Check cooldown only if user has previously failed
+            const cooldownResponse = await fetch('https://benjy244.github.io/omerta-roleplay/check-cooldown', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: currentUserId })
+            });
+            const cooldownData = await cooldownResponse.json();
+
+            if (cooldownData.onCooldown) {
+                showCooldownMessage(cooldownData.remainingTime);
             } else {
-                // Show cooldown message in UI
-                document.getElementById('login-section').classList.remove('active');
-                document.getElementById('cooldown-section').classList.add('active');
+                startQuiz(); // Show the quiz if not on cooldown
             }
         } catch (error) {
             console.error('Error:', error);
+            showError('There was an error authenticating with Discord. Please try again.');
         }
     }
 });
 
-// Generate Quiz UI
+// Helper function to show cooldown message
+function showCooldownMessage(remainingTime) {
+    document.getElementById('login-section').classList.remove('active');
+    document.getElementById('quiz-section').classList.remove('active');
+    document.getElementById('cooldown-section').classList.add('active');
+    
+    const { hours, minutes } = remainingTime;
+    document.getElementById('cooldown-timer').textContent = 
+        `Preostalo vrijeme: ${hours} sati i ${minutes} minuta`;
+}
+
+// Helper function to show error message
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+}
+
+// Update the startQuiz function
 function startQuiz() {
     document.getElementById('login-section').classList.remove('active');
+    document.getElementById('cooldown-section').classList.remove('active');
     document.getElementById('quiz-section').classList.add('active');
     
     const quizContainer = document.getElementById('quiz-container');
@@ -206,6 +214,10 @@ function startQuiz() {
 
     // Initialize Lucide icons after adding them to DOM
     lucide.createIcons();
+    
+    // Enable submit button only when all questions are answered
+    const submitBtn = document.getElementById('submitQuiz');
+    submitBtn.disabled = true;
 }
 
 // Handle Answer Selection
