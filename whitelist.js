@@ -1,6 +1,6 @@
 // Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496'; // Your Discord Client ID
-const DISCORD_REDIRECT_URI = 'http://localhost:5500/whitelist.html'; // For local development server
+const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html'; // For local development server
 // If using Live Server in VS Code, it typically uses port 5500
 // If using a different port, adjust accordingly
 const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
