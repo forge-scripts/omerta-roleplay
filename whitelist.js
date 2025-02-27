@@ -126,12 +126,16 @@ window.addEventListener('load', async () => {
                 },
                 body: new URLSearchParams({
                     client_id: DISCORD_CLIENT_ID,
-                    client_secret: 'YOUR_CLIENT_SECRET',
+                    client_secret: '1238809630008938496',
                     grant_type: 'authorization_code',
                     code: code,
                     redirect_uri: DISCORD_REDIRECT_URI
                 })
             });
+
+            if (!tokenResponse.ok) {
+                throw new Error('Failed to get access token');
+            }
 
             const tokenData = await tokenResponse.json();
             const accessToken = tokenData.access_token;
@@ -142,14 +146,21 @@ window.addEventListener('load', async () => {
                     Authorization: `Bearer ${accessToken}`
                 }
             });
+
+            if (!userResponse.ok) {
+                throw new Error('Failed to get user info');
+            }
+
             const userData = await userResponse.json();
             currentUserId = userData.id;
 
-            // Always show quiz immediately
+            // Show quiz immediately after successful authentication
             startQuiz();
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Authentication error:', error);
             showError('There was an error authenticating with Discord. Please try again.');
+            // Show login section again on error
+            document.getElementById('login-section').classList.add('active');
         }
     } else {
         // Show login section if no code is present
@@ -233,48 +244,35 @@ function handleAnswer(questionIndex, answerIndex) {
     submitBtn.disabled = userAnswers.includes(null);
 }
 
-// Update the submit quiz handler to remove cooldown message
+// Update the submit quiz handler to handle everything client-side
 document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
     
     const passed = score >= REQUIRED_SCORE;
     
-    try {
-        const response = await fetch('https://benjy244.github.io/omerta-roleplay/assign-role', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: currentUserId,
-                passed: passed,
-                score: score
-            })
-        });
-
-        const data = await response.json();
-        
-        document.getElementById('quiz-section').classList.remove('active');
-        document.getElementById('result-section').classList.add('active');
-        
-        if (passed) {
-            document.getElementById('success-result').style.display = 'block';
-            document.getElementById('fail-result').style.display = 'none';
-        } else {
-            document.getElementById('success-result').style.display = 'none';
-            document.getElementById('fail-result').style.display = 'block';
-            // Remove cooldown message from fail result
-            document.getElementById('fail-result').innerHTML = `
-                <i data-lucide="x-circle"></i>
-                <h3>Pokušajte Ponovno</h3>
-                <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
-            `;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('There was an error. Please try again.');
+    document.getElementById('quiz-section').classList.remove('active');
+    document.getElementById('result-section').classList.add('active');
+    
+    if (passed) {
+        document.getElementById('success-result').style.display = 'block';
+        document.getElementById('fail-result').style.display = 'none';
+        // Initialize Lucide icons for success message
+        lucide.createIcons();
+    } else {
+        document.getElementById('success-result').style.display = 'none';
+        document.getElementById('fail-result').style.display = 'block';
+        document.getElementById('fail-result').innerHTML = `
+            <i data-lucide="x-circle"></i>
+            <h3>Pokušajte Ponovno</h3>
+            <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
+        `;
+        // Initialize Lucide icons for fail message
+        lucide.createIcons();
     }
+
+    // Log the result to console for debugging
+    console.log(`Quiz completed. Score: ${score}/${questions.length}. Passed: ${passed}`);
 });
 
 // Initialize Lucide icons
