@@ -28,6 +28,18 @@
     animation: fadeIn 0.5s ease;
 }
 
+.whitelist-section h2 {
+    color: #38bdf8;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+}
+
+.whitelist-section p {
+    color: #e5e7eb;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
 .question-box {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 15px;
@@ -203,7 +215,8 @@
 }
 
 .result-box i {
-    font-size: 4rem;
+    width: 64px;
+    height: 64px;
     margin-bottom: 1rem;
 }
 
@@ -213,6 +226,12 @@
 
 #fail-result i {
     color: #ef4444;
+}
+
+.error-message {
+    color: #ef4444;
+    margin-top: 1rem;
+    font-size: 0.9rem;
 }
 
 @keyframes fadeIn {
