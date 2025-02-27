@@ -1,6 +1,6 @@
 // Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496'; // Your Discord Client ID
-const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html'; // Production URL
+const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 // If using Live Server in VS Code, it typically uses port 5500
 // If using a different port, adjust accordingly
 const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
@@ -87,14 +87,17 @@ let currentUserId = null;
 
 // Function to handle Discord login
 function loginWithDiscord() {
-    const params = new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URI,
-        response_type: 'token',
-        scope: 'identify',
-    });
+    const params = new URLSearchParams();
+    params.append('client_id', DISCORD_CLIENT_ID);
+    params.append('redirect_uri', DISCORD_REDIRECT_URI);
+    params.append('response_type', 'code');  // Changed from 'token' to 'code'
+    params.append('scope', 'identify guilds.join guilds.members.read guilds');  // Updated scopes
 
-    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    console.log('Auth URL:', authUrl);
+    console.log('Redirect URI:', DISCORD_REDIRECT_URI);
+    
+    window.location.href = authUrl;
 }
 
 // Wait for DOM to load and add click event listener
@@ -110,21 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Add this function to check cooldown before starting quiz
 async function checkCooldown() {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get('access_token');
+    const fragment = new URLSearchParams(window.location.search); // Changed from hash to search
+    const code = fragment.get('code'); // Changed from access_token to code
     
     try {
         // First get user info from Discord
         const userResponse = await fetch('https://discord.com/api/users/@me', {
             headers: {
-                Authorization: `Bearer ${accessToken}`
+                Authorization: `Bearer ${code}`
             }
         });
         const userData = await userResponse.json();
         currentUserId = userData.id;
 
         // Then check cooldown
-        const cooldownResponse = await fetch('http://localhost:3001/check-cooldown', {
+        const cooldownResponse = await fetch('https://benjy244.github.io/omerta-roleplay/check-cooldown', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -233,7 +236,7 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
     const passed = score >= REQUIRED_SCORE;
     
     try {
-        const response = await fetch('https://your-api-domain.com/assign-role', {  // Replace with your actual API domain
+        const response = await fetch('https://benjy244.github.io/omerta-roleplay/assign-role', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
