@@ -90,8 +90,8 @@ function loginWithDiscord() {
     const params = new URLSearchParams();
     params.append('client_id', DISCORD_CLIENT_ID);
     params.append('redirect_uri', DISCORD_REDIRECT_URI);
-    params.append('response_type', 'code');  // Changed from 'token' to 'code'
-    params.append('scope', 'identify guilds.join guilds.members.read guilds');  // Updated scopes
+    params.append('response_type', 'token'); // Change back to token for implicit flow
+    params.append('scope', 'identify');  // Simplify scopes to just what we need
 
     const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
     console.log('Auth URL:', authUrl);
@@ -111,35 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Modify the window load handler
+// Modify the window load handler for implicit flow
 window.addEventListener('load', async () => {
-    const fragment = new URLSearchParams(window.location.search);
-    const code = fragment.get('code');
+    // Check for token in URL hash
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = fragment.get('access_token');
     
-    if (code) {
+    if (accessToken) {
         try {
-            // Exchange code for access token first
-            const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    client_id: DISCORD_CLIENT_ID,
-                    client_secret: '1238809630008938496',
-                    grant_type: 'authorization_code',
-                    code: code,
-                    redirect_uri: DISCORD_REDIRECT_URI
-                })
-            });
-
-            if (!tokenResponse.ok) {
-                throw new Error('Failed to get access token');
-            }
-
-            const tokenData = await tokenResponse.json();
-            const accessToken = tokenData.access_token;
-
             // Get user info using the access token
             const userResponse = await fetch('https://discord.com/api/users/@me', {
                 headers: {
@@ -153,6 +132,7 @@ window.addEventListener('load', async () => {
 
             const userData = await userResponse.json();
             currentUserId = userData.id;
+            console.log('Successfully authenticated user:', currentUserId);
 
             // Show quiz immediately after successful authentication
             startQuiz();
@@ -163,7 +143,7 @@ window.addEventListener('load', async () => {
             document.getElementById('login-section').classList.add('active');
         }
     } else {
-        // Show login section if no code is present
+        // Show login section if no token is present
         document.getElementById('login-section').classList.add('active');
         document.getElementById('quiz-section').classList.remove('active');
         document.getElementById('cooldown-section').classList.remove('active');
