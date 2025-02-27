@@ -15,7 +15,7 @@
             <div id="login-section" class="whitelist-section active">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
-                <button onclick="loginWithDiscord()" id="discordLoginBtn" class="discord-auth-btn" type="button">
+                <button id="discordLoginBtn" class="discord-auth-btn" type="button">
                     <i data-lucide="message-square"></i>
                     Prijavi se preko Discorda
                 </button>
@@ -39,7 +39,7 @@
                 <div id="fail-result" class="result-box">
                     <i data-lucide="x-circle"></i>
                     <h3>Pokušajte Ponovno</h3>
-                    <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
+                    <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno za 24 sata.</p>
                 </div>
             </div>
             
@@ -55,11 +55,5 @@
         </div>
     </div>
     <script src="whitelist.js"></script>
-    <script>
-        // Initialize Lucide icons
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-        });
-    </script>
 </body>
 </html> 
