@@ -88,18 +88,22 @@ let currentUserId = null;
 
 // Function to handle Discord login
 function loginWithDiscord() {
+    console.log('Login button clicked'); // Debug log
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'token',
-        scope: 'identify'
+        scope: 'identify guilds.join'
     });
 
-    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    console.log('Auth URL:', authUrl); // Debug log
+    window.location.href = authUrl;
 }
 
 // Function to show error message
 function showError(message) {
+    console.log('Showing error:', message); // Debug log
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.textContent = message;
@@ -109,6 +113,7 @@ function showError(message) {
 
 // Function to start quiz
 function startQuiz() {
+    console.log('Starting quiz'); // Debug log
     document.getElementById('login-section').classList.remove('active');
     document.getElementById('quiz-section').classList.add('active');
     
@@ -156,11 +161,17 @@ function handleAnswer(questionIndex, answerIndex) {
     submitBtn.disabled = userAnswers.includes(null);
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+// Main initialization
+window.addEventListener('load', async () => {
+    console.log('Page loaded'); // Debug log
+    
+    // Set up login button
     const loginButton = document.getElementById('discordLoginBtn');
     if (loginButton) {
-        loginButton.onclick = loginWithDiscord;
+        console.log('Login button found'); // Debug log
+        loginButton.addEventListener('click', loginWithDiscord);
+    } else {
+        console.log('Login button not found'); // Debug log
     }
 
     // Check for Discord authentication response
@@ -168,41 +179,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const accessToken = fragment.get('access_token');
     
     if (accessToken) {
-        // Get user info from Discord
-        fetch('https://discord.com/api/users/@me', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
+        console.log('Access token found'); // Debug log
+        try {
+            // Get user info from Discord
+            const userResponse = await fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            if (!userResponse.ok) {
+                throw new Error('Failed to get user info');
             }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to get user info');
-            return response.json();
-        })
-        .then(data => {
-            currentUserId = data.id;
+
+            const userData = await userResponse.json();
+            console.log('User data received:', userData.id); // Debug log
+            currentUserId = userData.id;
             startQuiz();
-        })
-        .catch(error => {
-            console.error('Error:', error);
+        } catch (error) {
+            console.error('Error during authentication:', error);
             showError('Failed to authenticate with Discord. Please try again.');
             document.getElementById('login-section').classList.add('active');
-        });
+        }
     } else {
+        console.log('No access token, showing login'); // Debug log
         document.getElementById('login-section').classList.add('active');
     }
 });
 
 // Handle quiz submission
 document.getElementById('submitQuiz')?.addEventListener('click', async () => {
+    console.log('Quiz submitted'); // Debug log
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
     
+    console.log('Score:', score); // Debug log
     const passed = score >= REQUIRED_SCORE;
     
     document.getElementById('quiz-section').classList.remove('active');
     document.getElementById('result-section').classList.add('active');
     
     if (passed) {
+        console.log('Quiz passed, assigning role'); // Debug log
         document.getElementById('success-result').style.display = 'block';
         document.getElementById('fail-result').style.display = 'none';
         
@@ -217,6 +235,8 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
                     passed: true
                 })
             });
+
+            console.log('Role assignment response:', response.status); // Debug log
 
             if (!response.ok) {
                 throw new Error('Failed to assign role');
@@ -233,7 +253,7 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
                 throw new Error('Role assignment failed');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error assigning role:', error);
             document.getElementById('success-result').innerHTML = `
                 <i data-lucide="check-circle"></i>
                 <h3>Čestitamo!</h3>
@@ -242,6 +262,7 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
             `;
         }
     } else {
+        console.log('Quiz failed'); // Debug log
         document.getElementById('success-result').style.display = 'none';
         document.getElementById('fail-result').style.display = 'block';
     }
