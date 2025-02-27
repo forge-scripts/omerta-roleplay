@@ -1,9 +1,11 @@
 // Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496'; // Your Discord Client ID
-const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
-// If using Live Server in VS Code, it typically uses port 5500
-// If using a different port, adjust accordingly
-const DISCORD_API_ENDPOINT = 'https://discord.com/api/v10';
+const DISCORD_REDIRECT_URI = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5500/whitelist.html'
+    : 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+const BOT_ENDPOINT = window.location.hostname === 'localhost'
+    ? 'http://localhost:3001'
+    : 'http://localhost:3001'; // When you host the bot, replace this with your hosted bot URL
 const REQUIRED_SCORE = 6; // Out of 7 questions
 const WHITELIST_ROLE_ID = '1344671671377858590';
 
@@ -203,7 +205,7 @@ document.getElementById('submitQuiz')?.addEventListener('click', async () => {
         
         try {
             // Make API call to your bot's endpoint
-            const response = await fetch('http://localhost:3001/assign-role', {
+            const response = await fetch(`${BOT_ENDPOINT}/assign-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
