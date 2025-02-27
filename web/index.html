@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMERTA RP - Novo FiveM Iskustvo</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://cdn.discordapp.com/attachments/1246445471145136238/1344651535409483806/OmertaProPng.png?ex=67c1afd4&is=67c05e54&hm=ec502be8c1895a64d45995663bef56e5923e8ca98c6d531a384d12a1aa4c9534&" alt="OMERTA RP Logo" class="nav-logo">
+            <span class="server-name">OMERTA RP</span>
+        </div>
+        <div class="nav-links">
+            <a href="#home" class="active"><i data-lucide="home"></i>Početna</a>
+            <a href="#features"><i data-lucide="layers"></i>Značajke</a>
+            <a href="#rules"><i data-lucide="shield"></i>Pravila</a>
+            <a href="#discord"><i data-lucide="users"></i>Zajednica</a>
+            <a href="whitelist.html" id="whitelistButton"><i data-lucide="check-circle"></i>Whitelist</a>
+            <a href="donations.html" class="nav-donate"><i data-lucide="heart"></i>Donacije</a>
+        </div>
+        <div class="nav-toggle">
+            <i data-lucide="menu"></i>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <div class="cyber-box">
+                <h1 data-text="OMERTA_RP">OMERTA RP</h1>
+                <p class="cyber-text">Nova Generacija FiveM Iskustva</p>
+                <div class="cta-buttons">
+                    <a href="#" class="cta-primary" id="connectButton">
+                        <i data-lucide="power"></i>
+                        <span>Pridruži se</span>
+                        <span class="server-status">Igrači: <span id="playerCount">0</span>/64</span>
+                    </a>
+                    <a href="https://discord.gg/your-discord" class="cta-secondary" id="discordButton">
+                        <i data-lucide="message-square"></i>
+                        <span>Discord</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <h2 class="section-title">Značajke Sustava</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i data-lucide="code-2"></i>
+                <h3>Napredni Framework</h3>
+                <p>Doživite naš prilagođeni sustav dizajniran za potpuno roleplay iskustvo</p>
+                <div class="card-footer">
+                    <span class="status-tag">OPTIMIZIRANO</span>
+                </div>
+            </div>
+            <div class="feature-card">
+                <i data-lucide="car"></i>
+                <h3>Premium Vozila</h3>
+                <p>Velika kolekcija prilagođenih vozila s realističnim upravljanjem</p>
+                <div class="card-footer">
+                    <span class="status-tag">100+ VOZILA</span>
+                </div>
+            </div>
+            <div class="feature-card">
+                <i data-lucide="trending-up"></i>
+                <h3>Dinamična Ekonomija</h3>
+                <p>Ekonomija vođena igračima s brojnim karijernim mogućnostima</p>
+                <div class="card-footer">
+                    <span class="status-tag">BALANSIRANO</span>
+                </div>
+            </div>
+            <div class="feature-card">
+                <i data-lucide="package"></i>
+                <h3>Posebni Sustavi</h3>
+                <p>Jedinstvena mehanika igre i interaktivne značajke</p>
+                <div class="card-footer">
+                    <span class="status-tag">EKSKLUZIVNO</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="rules" class="rules">
+        <h2 class="section-title">Protokol Servera</h2>
+        <div class="rules-container">
+            <div class="rule">
+                <i data-lucide="shield-check"></i>
+                <h3>Protokol Fair Playa</h3>
+                <p>Održavajte profesionalno ponašanje i poštovanje prema svim igračima</p>
+            </div>
+            <div class="rule">
+                <i data-lucide="swords"></i>
+                <h3>Protokol Borbe</h3>
+                <p>Sudjelujte u roleplay sukobima s valjanim razlozima</p>
+            </div>
+            <div class="rule">
+                <i data-lucide="user-check"></i>
+                <h3>Protokol Identiteta</h3>
+                <p>Održavajte integritet karaktera i autentičnost roleplayja</p>
+            </div>
+            <div class="rule">
+                <i data-lucide="eye-off"></i>
+                <h3>Protokol Informacija</h3>
+                <p>Koristite samo informacije dostupne unutar igre</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="discord" class="discord">
+        <div class="discord-content">
+            <h2 class="section-title">Centar Zajednice</h2>
+            <p class="section-subtitle">Pridružite se našoj mreži od <span id="discordMembers">0</span> aktivnih članova</p>
+            <div class="status-grid">
+                <div class="status-card">
+                    <i data-lucide="users"></i>
+                    <h3>Aktivni Igrači</h3>
+                    <span id="activePlayers">Učitavanje...</span>
+                </div>
+                <div class="status-card">
+                    <i data-lucide="activity"></i>
+                    <h3>Status Servera</h3>
+                    <span id="serverStatus" class="status-online">ONLINE</span>
+                </div>
+                <div class="status-card">
+                    <i data-lucide="timer"></i>
+                    <h3>Vrijeme Odziva</h3>
+                    <span id="serverPing">12ms</span>
+                </div>
+            </div>
+            <a href="https://discord.gg/your-discord" class="discord-button" target="_blank">
+                <i data-lucide="message-square"></i>
+                Pristupi Zajednici
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i data-lucide="cpu"></i> OMERTA_RP</h3>
+                <p>Nova Generacija Roleplay Iskustva</p>
+            </div>
+            <div class="footer-section">
+                <h3><i data-lucide="link"></i> Navigacija</h3>
+                <a href="#home">Početna</a>
+                <a href="#features">Značajke</a>
+                <a href="#rules">Pravila</a>
+                <a href="#discord">Zajednica</a>
+            </div>
+            <div class="footer-section">
+                <h3><i data-lucide="share-2"></i> Povezivanje</h3>
+                <div class="social-links">
+                    <a href="https://discord.gg/your-discord" target="_blank"><i data-lucide="message-square"></i></a>
+                    <a href="https://twitter.com/your-twitter" target="_blank"><i data-lucide="twitter"></i></a>
+                    <a href="https://youtube.com/your-youtube" target="_blank"><i data-lucide="youtube"></i></a>
+                    <a href="https://tiktok.com/@your-tiktok" target="_blank"><i data-lucide="video"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 OMERTA_RP // Status Sustava: Online</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
