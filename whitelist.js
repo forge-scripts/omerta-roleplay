@@ -1,5 +1,6 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URL = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+const DISCORD_ROLE_ID = '1344671671377858590';
 const API_ENDPOINT = 'https://digi.pylex.xyz:9990';
 
 const questions = [
@@ -162,28 +163,37 @@ function startQuiz() {
     
     const quizSection = document.getElementById('quiz-section');
     quizSection.innerHTML = `
-        <div class="quiz-container">
-            <div class="progress-bar">
+        <div class="cyber-container">
+            <div class="cyber-progress">
                 <div class="progress-text">0/${questions.length} Pitanja</div>
-                <div class="progress-fill"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
             </div>
             ${questions.map((q, i) => `
-                <div class="question-card">
-                    <div class="question-number">
-                        <span class="cyber-text">#${(i + 1).toString().padStart(2, '0')}</span>
+                <div class="cyber-card" data-question="${i}">
+                    <div class="card-header">
+                        <div class="question-number">
+                            <div class="cyber-line"></div>
+                            <span class="cyber-text">PITANJE ${(i + 1).toString().padStart(2, '0')}</span>
+                        </div>
+                        <div class="cyber-decoration">
+                            <div class="cyber-circle"></div>
+                            <div class="cyber-line"></div>
+                        </div>
                     </div>
                     <div class="question-content">
                         <h3 class="cyber-question">${q.question}</h3>
-                        <div class="options-grid">
+                        <div class="cyber-grid">
                             ${q.options.map((opt, j) => `
-                                <div class="option-card">
+                                <div class="option-wrapper">
                                     <input type="radio" id="q${i}a${j}" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
                                     <label for="q${i}a${j}" class="cyber-option">
-                                        <div class="option-border"></div>
                                         <div class="option-content">
-                                            <span class="option-number">${String.fromCharCode(65 + j)}</span>
+                                            <span class="option-marker">${String.fromCharCode(65 + j)}</span>
                                             <span class="option-text">${opt}</span>
                                         </div>
+                                        <div class="cyber-glitch"></div>
                                     </label>
                                 </div>
                             `).join('')}
@@ -191,12 +201,234 @@ function startQuiz() {
                     </div>
                 </div>
             `).join('')}
-            <button onclick="submitQuiz()" id="submitQuiz" class="cyber-button" disabled>
-                <span class="cyber-button-text">PREDAJ TEST</span>
-                <div class="cyber-button-glitch"></div>
+            <button onclick="submitQuiz()" id="submitQuiz" class="cyber-submit" disabled>
+                <span class="button-text">PREDAJ TEST</span>
+                <div class="button-glitch"></div>
             </button>
         </div>
     `;
+
+    // Add the new cyberpunk styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .cyber-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+        }
+
+        .cyber-progress {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-text {
+            color: #0ff;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #0ff;
+            box-shadow: 0 0 10px #0ff;
+            transition: width 0.3s ease;
+        }
+
+        .cyber-card {
+            background: rgba(16, 24, 39, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0ff, transparent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cyber-text {
+            color: #0ff;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #0ff;
+        }
+
+        .cyber-decoration {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cyber-circle {
+            width: 8px;
+            height: 8px;
+            background: #0ff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #0ff;
+        }
+
+        .cyber-line {
+            width: 30px;
+            height: 2px;
+            background: #0ff;
+            box-shadow: 0 0 5px #0ff;
+        }
+
+        .cyber-question {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            text-shadow: 0 0 2px white;
+        }
+
+        .cyber-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .option-wrapper {
+            position: relative;
+        }
+
+        .option-wrapper input[type="radio"] {
+            display: none;
+        }
+
+        .cyber-option {
+            display: block;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-option:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #0ff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .option-wrapper input[type="radio"]:checked + .cyber-option {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .option-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .option-marker {
+            color: #0ff;
+            font-weight: 600;
+            font-size: 18px;
+            text-shadow: 0 0 5px #0ff;
+        }
+
+        .option-text {
+            color: white;
+            font-size: 16px;
+        }
+
+        .cyber-submit {
+            width: 100%;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            border-radius: 8px;
+            color: #0ff;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .cyber-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .cyber-submit:not(:disabled):hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .button-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .button-glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 255, 0.3);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .cyber-submit:not(:disabled):hover .button-glitch {
+            transform: translateX(100%);
+        }
+
+        @media (max-width: 768px) {
+            .cyber-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 function handleAnswer(questionIndex, answerIndex) {
@@ -214,7 +446,7 @@ function handleAnswer(questionIndex, answerIndex) {
     document.getElementById('submitQuiz').disabled = userAnswers.includes(null);
 }
 
-function submitQuiz() {
+async function submitQuiz() {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
     
@@ -226,6 +458,29 @@ function submitQuiz() {
     if (passed) {
         document.getElementById('success-result').style.display = 'block';
         document.getElementById('fail-result').style.display = 'none';
+        
+        try {
+            // Send request to your backend to assign the role
+            const response = await fetch('http://digi.pylex.xyz:9990/assign-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    roleId: DISCORD_ROLE_ID,
+                    passed: true
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to assign role');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Still show success but note the role assignment issue
+            showError('Quiz passed but role assignment failed. Please contact an administrator.');
+        }
     } else {
         document.getElementById('success-result').style.display = 'none';
         document.getElementById('fail-result').style.display = 'block';
