@@ -4,7 +4,7 @@ lucide.createIcons();
 // Server Configuration
 const SERVER_CONFIG = {
     ip: 'connect.omertarp.com:30120',
-    discord: 'https://discord.gg/your-discord',
+    discord: 'https://discord.gg/omertaroleplay',
     maxPlayers: 64
 };
 
@@ -12,7 +12,7 @@ const SERVER_CONFIG = {
 const TRANSLATIONS = {
     ipCopied: 'IP Kopiran!',
     loading: 'Učitavanje...',
-    connect: '<i data-lucide="power"></i><span>Pridruži se</span><span class="server-status">Igrači: <span id="playerCount">0</span>/64</span>'
+    connect: '<i data-lucide="power"></i><span>Pridruži se</span><span class="server-status">Igrači: <span id="playerCount">u</span>izradnji</span>'
 };
 
 // DOM Elements
