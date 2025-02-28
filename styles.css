@@ -115,9 +115,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://imgur.com/a/J8131CJ');
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://i.imgur.com/J8131CJ.jpg') no-repeat center center;
     background-size: cover;
-    background-position: center;
     background-attachment: fixed;
     position: relative;
     overflow: hidden;
