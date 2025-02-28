@@ -187,55 +187,47 @@ async function submitQuiz() {
     if (score >= REQUIRED_SCORE) {
         try {
             const userId = localStorage.getItem('discord_user_id');
-            console.log('User ID:', userId);
+            console.log('Attempting to assign role for user:', userId);
 
             if (!userId) {
                 throw new Error('User ID not found. Please log in again.');
             }
 
-            console.log('Sending request to:', `${API_ENDPOINT}/add-role`);
-            
-            // First try the test endpoint
-            try {
-                const testResponse = await fetch(`${API_ENDPOINT}/test`);
-                console.log('Test endpoint response:', await testResponse.json());
-            } catch (testError) {
-                console.error('Test endpoint failed:', testError);
-            }
+            // Create the request URL
+            const url = new URL('/add-role', API_ENDPOINT).toString();
+            console.log('Sending request to:', url);
 
-            // Now try the actual role assignment
-            const response = await fetch(`${API_ENDPOINT}/add-role`, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                mode: 'cors',
+                mode: 'cors', // Important for cross-origin requests
                 body: JSON.stringify({ userId: userId })
             });
 
             console.log('Response status:', response.status);
+            let data;
             
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response:', errorText);
-                throw new Error(`Server error: ${response.status} - ${errorText}`);
+            try {
+                data = await response.json();
+                console.log('Response data:', data);
+            } catch (e) {
+                console.error('Error parsing response:', e);
+                throw new Error('Invalid response from server');
             }
 
-            const data = await response.json();
-            console.log('Response data:', data);
-
             if (data.success) {
-                displayMessage(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`, 'success');
+                alert(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`);
             } else {
                 throw new Error(data.error || 'Greška pri dodjeljivanju uloge');
             }
         } catch (error) {
             console.error('Role assignment error:', error);
-            displayMessage(`Test je položen (${score}/${questions.length}), ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ${error.message}\n\nMolimo kontaktirajte administratora.`, 'error');
+            alert(`Test je položen (${score}/${questions.length}), ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ${error.message}\n\nMolimo kontaktirajte administratora.`);
         }
     } else {
-        displayMessage(`Niste prošli test. Rezultat: ${score}/${questions.length}. Potrebno je ${REQUIRED_SCORE} točnih odgovora.`, 'error');
+        alert(`Niste prošli test. Rezultat: ${score}/${questions.length}. Potrebno je ${REQUIRED_SCORE} točnih odgovora.`);
     }
 }
 
