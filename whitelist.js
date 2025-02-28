@@ -3,19 +3,9 @@ const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
 
-let userAnswers = new Array(questions.length).fill(null);
-let currentUserId = null;
-
-// Hide all sections except login initially
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('quiz-section').style.display = 'none';
-    document.getElementById('result-section').style.display = 'none';
-    document.getElementById('login-section').style.display = 'block';
-});
-
-function loginWithDiscord() {
+// Make the loginWithDiscord function global and simpler
+window.loginWithDiscord = function() {
     console.log('Login button clicked');
-    
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
@@ -27,7 +17,17 @@ function loginWithDiscord() {
     const authUrl = 'https://discord.com/oauth2/authorize?' + params.toString();
     console.log('Redirecting to:', authUrl);
     window.location.href = authUrl;
-}
+};
+
+let userAnswers = new Array(questions.length).fill(null);
+let currentUserId = null;
+
+// Hide all sections except login initially
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('login-section').style.display = 'block';
+});
 
 // Function to show error message
 function showError(message) {
