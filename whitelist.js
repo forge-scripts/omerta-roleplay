@@ -112,12 +112,13 @@ let currentUserId = null;
 window.loginWithDiscord = function() {
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URI,
+        redirect_url: DISCORD_REDIRECT_URL,
         response_type: 'token',
-        scope: 'identify guilds.join'
+        scope: 'identify guilds.join',
+        prompt: 'consent'
     });
 
-    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    window.location.href = `https://discord.com/oauth2/authorize?${params}`;
 };
 
 function showError(message) {
@@ -375,38 +376,42 @@ window.handleAnswer = function(questionIndex, answerIndex) {
 window.addEventListener('load', async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = fragment.get('access_token');
+    const error = fragment.get('error');
+    
+    if (error) {
+        console.error('Discord auth error:', error);
+        showError('Authentication failed. Please try again.');
+        document.getElementById('login-section').style.display = 'block';
+        return;
+    }
     
     if (accessToken) {
         try {
             const userResponse = await fetch('https://discord.com/api/users/@me', {
                 headers: {
-                    Authorization: `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
             if (!userResponse.ok) {
-                throw new Error('Failed to get user info');
+                throw new Error(`HTTP error! status: ${userResponse.status}`);
             }
 
             const userData = await userResponse.json();
             currentUserId = userData.id;
-
-            // Check for cooldown
-            const cooldownCheck = await fetch(`${API_ENDPOINT}/check-cooldown/${currentUserId}`);
-            const cooldownData = await cooldownCheck.json();
-
-            if (!cooldownData.canAttempt) {
-                showCooldown(cooldownData.remainingTime);
-            } else {
-                startQuiz();
-            }
+            console.log('Successfully authenticated user:', userData.username);
+            
+            // Start quiz immediately after successful auth
+            startQuiz();
         } catch (error) {
-            console.error('Error:', error);
-            showError('Failed to authenticate with Discord. Please try again.');
-            document.getElementById('login-section').classList.add('active');
+            console.error('Authentication error:', error);
+            showError('Failed to authenticate. Please try again.');
+            document.getElementById('login-section').style.display = 'block';
         }
     } else {
-        document.getElementById('login-section').classList.add('active');
+        // No access token, show login
+        document.getElementById('login-section').style.display = 'block';
     }
 });
 
