@@ -15,13 +15,13 @@
             <div id="login-section" class="whitelist-section">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
-                <button onclick="loginWithDiscord()" class="discord-auth-btn">
+                <!-- Updated button with explicit onclick handler -->
+                <button type="button" onclick="window.loginWithDiscord()" class="discord-auth-btn">
                     <i data-lucide="message-square"></i>
                     Prijavi se preko Discorda
                 </button>
             </div>
             
-            <!-- Updated section with display: none -->
             <div id="quiz-section" class="whitelist-section" style="display: none;">
                 <h2>Roleplay Kviz</h2>
                 <p>Odgovorite točno na sljedeća pitanja za pristup serveru</p>
@@ -31,7 +31,6 @@
                 </button>
             </div>
             
-            <!-- Updated section with display: none -->
             <div id="result-section" class="whitelist-section" style="display: none;">
                 <div id="success-result" class="result-box">
                     <i data-lucide="check-circle"></i>
@@ -47,9 +46,15 @@
         </div>
     </div>
 
+    <!-- Make sure whitelist.js is loaded before any script that uses it -->
     <script src="whitelist.js"></script>
     <script>
         lucide.createIcons();
+        
+        // Add a backup click handler
+        document.querySelector('.discord-auth-btn').addEventListener('click', function() {
+            window.loginWithDiscord();
+        });
     </script>
 </body>
 </html>
