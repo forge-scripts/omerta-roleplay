@@ -1,17 +1,183 @@
-.error-message {
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-    padding: 1rem;
-    margin-top: 1rem;
-    border-radius: 8px;
-    text-align: center;
+.whitelist-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #e5e7eb;
+}
+
+.whitelist-box {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .whitelist-section {
     display: none;
 }
 
-#login-section {
+.whitelist-section.active {
     display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.whitelist-section h2 {
+    color: #38bdf8;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.whitelist-section p {
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.discord-auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1.25rem;
+    background: #5865F2;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.discord-auth-btn:hover {
+    background: #4752c4;
+    transform: translateY(-2px);
+}
+
+.question-box {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(56, 189, 248, 0.1);
+}
+
+.question-box h4 {
+    color: #38bdf8;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.options {
+    display: grid;
+    gap: 1rem;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(56, 189, 248, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option:hover {
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.option.selected {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+}
+
+.option input[type="radio"] {
+    display: none;
+}
+
+.option i {
+    color: #38bdf8;
+    margin-right: 1rem;
+}
+
+.submit-quiz-btn {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+}
+
+.submit-quiz-btn:disabled {
+    background: #1e293b;
+    cursor: not-allowed;
+}
+
+.submit-quiz-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.result-box {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.result-box i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+#success-result i {
+    color: #10b981;
+}
+
+#fail-result i {
+    color: #ef4444;
+}
+
+.error-message {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.cooldown-timer {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ef4444;
+    margin: 1.5rem 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
