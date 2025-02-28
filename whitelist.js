@@ -130,11 +130,18 @@ function selectAnswer(answerIndex) {
 
 function showQuestion() {
     const questionContainer = document.getElementById('question-container');
+    if (!questionContainer) {
+        console.error('Question container not found!');
+        return;
+    }
+
     const currentQ = questions[currentQuestion];
     
     let html = `
-        <h3>${currentQ.question}</h3>
-        <div class="answers">
+        <div class="question-box">
+            <h3>Pitanje ${currentQuestion + 1} od ${questions.length}</h3>
+            <p class="question-text">${currentQ.question}</p>
+            <div class="answers">
     `;
     
     currentQ.options.forEach((answer, index) => {
@@ -144,9 +151,15 @@ function showQuestion() {
         `;
     });
     
-    html += `</div>
-        <button onclick="submitQuiz()" ${currentQuestion === questions.length - 1 ? '' : 'style="display:none;"'}>Submit Quiz</button>
-        <button onclick="nextQuestion()" ${currentQuestion === questions.length - 1 ? 'style="display:none;"' : ''}>Next Question</button>
+    html += `
+            </div>
+            <div class="navigation-buttons">
+                ${currentQuestion === questions.length - 1 ? 
+                    `<button class="submit-btn" onclick="submitQuiz()">Završi Test</button>` : 
+                    `<button class="next-btn" onclick="nextQuestion()">Sljedeće Pitanje</button>`
+                }
+            </div>
+        </div>
     `;
     
     questionContainer.innerHTML = html;
@@ -177,7 +190,7 @@ async function submitQuiz() {
                 throw new Error('User ID not found. Please log in again.');
             }
 
-            const response = await fetch('http://localhost:9990/add-role', {
+            const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -217,35 +230,12 @@ function displayMessage(message, type) {
 // Start the quiz when the page loads
 function startQuiz() {
     currentQuestion = 0;
-    userAnswers = [];
+    userAnswers = new Array(questions.length).fill(null);
+    document.getElementById('quiz-section').style.display = 'block';
     showQuestion();
 }
 
 // Make sure to call startQuiz when the page loads
-window.onload = function() {
-    if (document.getElementById('question-container')) {
-        startQuiz();
-    }
-};
-
-// Simplified login function
-function loginWithDiscord() {
-    console.log('Login attempt started'); // Debug log
-    
-    const params = new URLSearchParams({
-        client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URL, // Note: using DISCORD_REDIRECT_URL here
-        response_type: 'token',
-        scope: 'identify',
-        prompt: 'consent'
-    });
-
-    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
-    console.log('Auth URL:', authUrl); // Debug log
-    window.location.href = authUrl;
-}
-
-// Simplified authentication check
 window.addEventListener('load', async () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = fragment.get('access_token');
@@ -264,16 +254,40 @@ window.addEventListener('load', async () => {
 
             const userData = await userResponse.json();
             currentUserId = userData.id;
+            localStorage.setItem('discord_user_id', userData.id);
             console.log('Auth successful:', userData.username);
+            
+            // Hide login section and show quiz section
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
             startQuiz();
         } catch (error) {
             console.error('Auth error:', error);
             document.getElementById('login-section').style.display = 'block';
+            document.getElementById('quiz-section').style.display = 'none';
         }
     } else {
         document.getElementById('login-section').style.display = 'block';
+        document.getElementById('quiz-section').style.display = 'none';
     }
 });
+
+// Simplified login function
+function loginWithDiscord() {
+    console.log('Login attempt started'); // Debug log
+    
+    const params = new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID,
+        redirect_uri: DISCORD_REDIRECT_URL, // Note: using DISCORD_REDIRECT_URL here
+        response_type: 'token',
+        scope: 'identify',
+        prompt: 'consent'
+    });
+
+    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    console.log('Auth URL:', authUrl); // Debug log
+    window.location.href = authUrl;
+}
 
 // Add some CSS for better error display
 const style = document.createElement('style');
