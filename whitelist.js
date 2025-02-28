@@ -1,7 +1,7 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URL = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const DISCORD_ROLE_ID = '1344671671377858590';
-const API_ENDPOINT = 'https://digi.pylex.xyz:443';
+const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
 
 const questions = [
     {
@@ -197,14 +197,12 @@ async function submitQuiz() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
                 },
-                mode: 'cors',
-                credentials: 'omit',
-                body: JSON.stringify({ userId: userId })
-            }).catch(error => {
-                console.error('Fetch error:', error);
-                throw new Error('Network error: ' + error.message);
+                body: JSON.stringify({ 
+                    userId: userId,
+                    guildId: DISCORD_CLIENT_ID,
+                    roleId: DISCORD_ROLE_ID
+                })
             });
 
             console.log('Response status:', response.status);
@@ -362,3 +360,6 @@ window.selectAnswer = selectAnswer;
 window.nextQuestion = nextQuestion;
 window.submitQuiz = submitQuiz;
 window.startQuiz = startQuiz;
+
+// Add this meta tag to your HTML file to allow mixed content
+document.head.innerHTML += '<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">';
