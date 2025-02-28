@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OMERTA RP - Whitelist</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="whitelist-styles.css">
+    <script src="whitelist.js"></script>
 </head>
 <body>
     <div class="whitelist-container">
         <div class="whitelist-box">
+            <!-- Login Section -->
             <div id="login-section">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
@@ -17,6 +21,11 @@
                     Prijavi se preko Discorda
                 </button>
                 <div id="error-message" style="display: none;" class="error-message"></div>
+            </div>
+
+            <!-- Quiz Section (Initially Hidden) -->
+            <div id="quiz-section" style="display: none;">
+                <!-- This will be populated by whitelist.js -->
             </div>
         </div>
     </div>
@@ -59,7 +68,19 @@
 
                         const userData = await response.json();
                         console.log('Logged in as:', userData.username);
-                        // Here you can proceed with the quiz or other functionality
+                        
+                        // Hide login section
+                        document.getElementById('login-section').style.display = 'none';
+                        
+                        // Show quiz section
+                        document.getElementById('quiz-section').style.display = 'block';
+                        
+                        // Start the quiz from whitelist.js
+                        if (typeof startQuiz === 'function') {
+                            startQuiz();
+                        } else {
+                            console.error('startQuiz function not found. Make sure whitelist.js is loaded properly.');
+                        }
                     }
                 }
             } catch (error) {
