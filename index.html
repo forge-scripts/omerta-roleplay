@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; block-all-mixed-content">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob: 'unsafe-inline'; connect-src * 'unsafe-inline';">
 </head>
 <body>
     <nav class="navbar">
@@ -16,7 +17,7 @@
             <span class="server-name">OMERTA RP</span>
         </div>
         <div class="nav-links">
-            <a href="#home" class="active"><i data-lucide="home"></i>Početna</a>
+            <a href="#home" class="active"><i data-luc  ide="home"></i>Početna</a>
             <a href="#features"><i data-lucide="layers"></i>Značajke</a>
             <a href="#rules"><i data-lucide="shield"></i>Pravila</a>
             <a href="#discord"><i data-lucide="users"></i>Zajednica</a>
