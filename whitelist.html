@@ -22,59 +22,39 @@
     </div>
 
     <script>
-        const CLIENT_ID = '1238809630008938496';
-        const REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
-
         function loginWithDiscord() {
-            try {
-                const params = {
-                    client_id: CLIENT_ID,
-                    redirect_uri: REDIRECT_URI,
-                    response_type: 'token',
-                    scope: 'identify guilds.join',
-                    prompt: 'consent'
-                };
-                
-                const queryString = Object.entries(params)
-                    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-                    .join('&');
+            const clientId = '1238809630008938496';
+            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+            const scope = 'identify%20guilds.join';
 
-                window.location.href = `https://discord.com/oauth2/authorize?${queryString}`;
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('An error occurred during login. Please try again.');
-            }
+            const url = 'https://discord.com/oauth2/authorize' +
+                '?response_type=token' +
+                '&client_id=' + clientId +
+                '&scope=' + scope +
+                '&redirect_uri=' + encodeURIComponent(redirectUri) +
+                '&prompt=consent';
+
+            window.location.href = url;
         }
 
         window.onload = async function() {
-            try {
-                const fragment = new URLSearchParams(window.location.hash.slice(1));
-                const accessToken = fragment.get('access_token');
-                const error = fragment.get('error');
-
-                if (error) {
-                    showError('Failed to authenticate with Discord. Please try again.');
-                    return;
-                }
-
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const accessToken = new URLSearchParams(hash).get('access_token');
                 if (accessToken) {
-                    const response = await fetch('https://discord.com/api/users/@me', {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to get user data');
+                    try {
+                        const response = await fetch('https://discord.com/api/users/@me', {
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`
+                            }
+                        });
+                        const data = await response.json();
+                        console.log('Logged in as:', data.username);
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showError('Failed to get user data');
                     }
-
-                    const userData = await response.json();
-                    console.log('Authenticated as:', userData.username);
-                    // Here you can proceed with the quiz or other functionality
                 }
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showError('Failed to authenticate. Please try again.');
             }
         };
 
