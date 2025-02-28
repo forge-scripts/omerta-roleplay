@@ -1078,4 +1078,59 @@ footer {
     .rule-item h3 {
         font-size: 1.1rem;
     }
+}
+
+/* PayPal Donation Button Styles */
+.donate-btn {
+    position: relative;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--primary-neon);
+    border-radius: 0.5rem;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--primary-neon);
+    font-weight: 600;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.donate-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(56, 189, 248, 0.2),
+        transparent
+    );
+    transition: all 0.5s ease;
+}
+
+.donate-btn:hover::before {
+    left: 100%;
+}
+
+.donate-btn:hover {
+    background: var(--primary-neon);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    transform: translateY(-2px);
+}
+
+.donate-btn:hover .btn-content {
+    color: var(--background);
 } 
