@@ -583,15 +583,20 @@ async function submitQuiz() {
         document.getElementById('fail-result').style.display = 'none';
         
         try {
+            // Get the access token from localStorage or URL fragment
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            
             // Send request to your backend to assign the role
-            const response = await fetch('http://digi.pylex.xyz:9990/assign-role', {
+            const response = await fetch('http://digi.pylex.xyz:9990/add-role', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     userId: currentUserId,
-                    roleId: DISCORD_ROLE_ID,
+                    roleId: '1344671671377858590', // Your specified role ID
+                    accessToken: accessToken,
                     passed: true
                 })
             });
@@ -599,10 +604,21 @@ async function submitQuiz() {
             if (!response.ok) {
                 throw new Error('Failed to assign role');
             }
+
+            const result = await response.json();
+            console.log('Role assignment result:', result);
+
         } catch (error) {
-            console.error('Error:', error);
-            // Still show success but note the role assignment issue
-            showError('Quiz passed but role assignment failed. Please contact an administrator.');
+            console.error('Role assignment error:', error);
+            // Show error message but keep success screen
+            const resultMessage = document.querySelector('.result-message');
+            if (resultMessage) {
+                resultMessage.innerHTML = `
+                    Test je položen, ali došlo je do greške pri dodjeljivanju uloge.<br>
+                    Molimo kontaktirajte administratora.
+                `;
+                resultMessage.style.color = '#ffaa00';
+            }
         }
     } else {
         document.getElementById('success-result').style.display = 'none';
