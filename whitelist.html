@@ -10,18 +10,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://cdn.discordapp.com/attachments/1246445471145136238/1344651535409483806/OmertaProPng.png" alt="OMERTA RP Logo" class="nav-logo">
+            <span class="server-name">OMERTA RP</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i data-lucide="home"></i>Početna</a>
+            <a href="index.html#features"><i data-lucide="layers"></i>Značajke</a>
+            <a href="index.html#rules"><i data-lucide="shield"></i>Pravila</a>
+            <a href="index.html#discord"><i data-lucide="users"></i>Zajednica</a>
+            <a href="whitelist.html" class="active"><i data-lucide="check-circle"></i>Whitelist</a>
+            <a href="donations.html" class="nav-donate"><i data-lucide="heart"></i>Donacije</a>
+        </div>
+    </nav>
+
+    <!-- Main Whitelist Container -->
     <div class="whitelist-container">
         <div class="whitelist-box">
+            <!-- Login Section -->
             <div id="login-section" class="whitelist-section">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
-                <!-- Updated button with explicit onclick handler -->
-                <button type="button" onclick="window.loginWithDiscord()" class="discord-auth-btn">
+                <button onclick="loginWithDiscord()" class="discord-auth-btn">
                     <i data-lucide="message-square"></i>
                     Prijavi se preko Discorda
                 </button>
             </div>
             
+            <!-- Quiz Section -->
             <div id="quiz-section" class="whitelist-section" style="display: none;">
                 <h2>Roleplay Kviz</h2>
                 <p>Odgovorite točno na sljedeća pitanja za pristup serveru</p>
@@ -31,6 +49,7 @@
                 </button>
             </div>
             
+            <!-- Result Section -->
             <div id="result-section" class="whitelist-section" style="display: none;">
                 <div id="success-result" class="result-box">
                     <i data-lucide="check-circle"></i>
@@ -40,21 +59,26 @@
                 <div id="fail-result" class="result-box">
                     <i data-lucide="x-circle"></i>
                     <h3>Pokušajte Ponovno</h3>
-                    <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno.</p>
+                    <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno za 24 sata.</p>
+                </div>
+            </div>
+
+            <!-- Cooldown Section -->
+            <div id="cooldown-section" class="whitelist-section" style="display: none;">
+                <div class="cooldown-box">
+                    <i data-lucide="clock" class="cooldown-icon"></i>
+                    <h3>Molimo pričekajte</h3>
+                    <p>Niste prošli whitelist test.</p>
+                    <div id="cooldown-timer" class="cooldown-timer"></div>
+                    <p>Proučite pravila i pokušajte ponovno kada vrijeme istekne.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Make sure whitelist.js is loaded before any script that uses it -->
     <script src="whitelist.js"></script>
     <script>
         lucide.createIcons();
-        
-        // Add a backup click handler
-        document.querySelector('.discord-auth-btn').addEventListener('click', function() {
-            window.loginWithDiscord();
-        });
     </script>
 </body>
 </html>
