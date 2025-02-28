@@ -46,7 +46,17 @@
     </div>
     <script src="whitelist.js"></script>
     <script>
+        // Initialize Lucide icons
         lucide.createIcons();
+        
+        // Debug check to ensure the function exists
+        console.log('Login function exists:', typeof loginWithDiscord === 'function');
+        
+        // Add click event listener as backup
+        document.querySelector('.discord-auth-btn').addEventListener('click', function() {
+            console.log('Button clicked via event listener');
+            loginWithDiscord();
+        });
     </script>
 </body>
 </html>
