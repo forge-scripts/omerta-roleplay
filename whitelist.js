@@ -163,37 +163,34 @@ function startQuiz() {
     
     const quizSection = document.getElementById('quiz-section');
     quizSection.innerHTML = `
-        <div class="cyber-container">
-            <div class="cyber-progress">
-                <div class="progress-text">0/${questions.length} Pitanja</div>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
+        <div class="neo-container">
+            <div class="neo-header">
+                <div class="neo-title">WHITELIST TEST</div>
+                <div class="neo-progress">
+                    <div class="progress-line">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">0/${questions.length} PITANJA</div>
                 </div>
             </div>
             ${questions.map((q, i) => `
-                <div class="cyber-card" data-question="${i}">
-                    <div class="card-header">
-                        <div class="question-number">
-                            <div class="cyber-line"></div>
-                            <span class="cyber-text">PITANJE ${(i + 1).toString().padStart(2, '0')}</span>
-                        </div>
-                        <div class="cyber-decoration">
-                            <div class="cyber-circle"></div>
-                            <div class="cyber-line"></div>
+                <div class="neo-card">
+                    <div class="neo-card-header">
+                        <div class="neo-question-number">
+                            <span class="number">${(i + 1).toString().padStart(2, '0')}</span>
+                            <div class="header-line"></div>
                         </div>
                     </div>
-                    <div class="question-content">
-                        <h3 class="cyber-question">${q.question}</h3>
-                        <div class="cyber-grid">
+                    <div class="neo-question">
+                        <h3>${q.question}</h3>
+                        <div class="neo-options">
                             ${q.options.map((opt, j) => `
-                                <div class="option-wrapper">
+                                <div class="neo-option">
                                     <input type="radio" id="q${i}a${j}" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
-                                    <label for="q${i}a${j}" class="cyber-option">
-                                        <div class="option-content">
-                                            <span class="option-marker">${String.fromCharCode(65 + j)}</span>
-                                            <span class="option-text">${opt}</span>
-                                        </div>
-                                        <div class="cyber-glitch"></div>
+                                    <label for="q${i}a${j}">
+                                        <span class="option-marker">${String.fromCharCode(65 + j)}</span>
+                                        <span class="option-text">${opt}</span>
+                                        <div class="option-border"></div>
                                     </label>
                                 </div>
                             `).join('')}
@@ -201,38 +198,91 @@ function startQuiz() {
                     </div>
                 </div>
             `).join('')}
-            <button onclick="submitQuiz()" id="submitQuiz" class="cyber-submit" disabled>
-                <span class="button-text">PREDAJ TEST</span>
-                <div class="button-glitch"></div>
+            <button id="submitQuiz" onclick="submitQuiz()" class="neo-button" disabled>
+                <span class="button-content">PREDAJ TEST</span>
+                <div class="button-border"></div>
             </button>
+        </div>
+    `;
+
+    // Update the results section HTML
+    const resultSection = document.getElementById('result-section');
+    resultSection.innerHTML = `
+        <div class="neo-result-container">
+            <div id="success-result" class="neo-result success">
+                <div class="result-icon">✓</div>
+                <h2>TEST USPJEŠNO POLOŽEN</h2>
+                <p>Čestitamo! Uspješno ste položili whitelist test.</p>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <span class="detail-label">STATUS</span>
+                        <span class="detail-value">VERIFIED</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">ULOGA</span>
+                        <span class="detail-value">DODIJELJENA</span>
+                    </div>
+                </div>
+                <div class="result-message">
+                    Možete pristupiti serveru!
+                </div>
+            </div>
+            
+            <div id="fail-result" class="neo-result fail">
+                <div class="result-icon">×</div>
+                <h2>TEST NIJE POLOŽEN</h2>
+                <p>Nažalost, niste položili whitelist test.</p>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <span class="detail-label">STATUS</span>
+                        <span class="detail-value">FAILED</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">POTREBNO</span>
+                        <span class="detail-value">${REQUIRED_SCORE} TOČNIH</span>
+                    </div>
+                </div>
+                <div class="result-message">
+                    Proučite pravila i pokušajte ponovno!
+                </div>
+                <button onclick="location.reload()" class="neo-retry-button">
+                    <span class="button-content">POKUŠAJ PONOVNO</span>
+                    <div class="button-border"></div>
+                </button>
+            </div>
         </div>
     `;
 
     // Add the new cyberpunk styles
     const style = document.createElement('style');
     style.textContent = `
-        .cyber-container {
-            max-width: 900px;
+        .neo-container {
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
+            padding: 30px;
+            background: rgba(13, 17, 23, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
         }
 
-        .cyber-progress {
-            margin-bottom: 30px;
+        .neo-header {
+            margin-bottom: 40px;
+        }
+
+        .neo-title {
+            color: #0ff;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .neo-progress {
             position: relative;
         }
 
-        .progress-text {
-            color: #0ff;
-            font-size: 14px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .progress-bar {
+        .progress-line {
             height: 4px;
             background: rgba(0, 255, 255, 0.1);
             border-radius: 2px;
@@ -242,22 +292,32 @@ function startQuiz() {
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: #0ff;
-            box-shadow: 0 0 10px #0ff;
+            background: linear-gradient(90deg, #0ff, #00ffaa);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
             transition: width 0.3s ease;
         }
 
-        .cyber-card {
-            background: rgba(16, 24, 39, 0.9);
+        .progress-text {
+            position: absolute;
+            right: 0;
+            top: -25px;
+            color: #0ff;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .neo-card {
+            background: rgba(16, 24, 39, 0.95);
             border: 1px solid rgba(0, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 25px;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .cyber-card::before {
+        .neo-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -267,107 +327,75 @@ function startQuiz() {
             background: linear-gradient(90deg, transparent, #0ff, transparent);
         }
 
-        .card-header {
+        .neo-question-number {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .question-number {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .cyber-text {
+        .neo-question-number .number {
             color: #0ff;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
-            letter-spacing: 2px;
-            text-shadow: 0 0 5px #0ff;
+            margin-right: 15px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
-        .cyber-decoration {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .cyber-circle {
-            width: 8px;
-            height: 8px;
-            background: #0ff;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #0ff;
-        }
-
-        .cyber-line {
-            width: 30px;
+        .header-line {
+            flex-grow: 1;
             height: 2px;
-            background: #0ff;
-            box-shadow: 0 0 5px #0ff;
+            background: linear-gradient(90deg, #0ff, transparent);
         }
 
-        .cyber-question {
+        .neo-question h3 {
             color: white;
             font-size: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             line-height: 1.4;
-            text-shadow: 0 0 2px white;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
         }
 
-        .cyber-grid {
+        .neo-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 20px;
         }
 
-        .option-wrapper {
-            position: relative;
-        }
-
-        .option-wrapper input[type="radio"] {
+        .neo-option input[type="radio"] {
             display: none;
         }
 
-        .cyber-option {
-            display: block;
-            padding: 15px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cyber-option:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: #0ff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-
-        .option-wrapper input[type="radio"]:checked + .cyber-option {
-            background: rgba(0, 255, 255, 0.15);
-            border-color: #0ff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .option-content {
+        .neo-option label {
             display: flex;
             align-items: center;
-            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
             position: relative;
-            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .neo-option label:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .neo-option input[type="radio"]:checked + label {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #0ff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
         }
 
         .option-marker {
             color: #0ff;
-            font-weight: 600;
             font-size: 18px;
-            text-shadow: 0 0 5px #0ff;
+            font-weight: 700;
+            margin-right: 15px;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
 
         .option-text {
@@ -375,12 +403,12 @@ function startQuiz() {
             font-size: 16px;
         }
 
-        .cyber-submit {
+        .neo-button, .neo-retry-button {
             width: 100%;
             padding: 20px;
             background: rgba(0, 255, 255, 0.1);
-            border: 2px solid #0ff;
-            border-radius: 8px;
+            border: none;
+            border-radius: 10px;
             color: #0ff;
             font-size: 20px;
             font-weight: 700;
@@ -389,41 +417,136 @@ function startQuiz() {
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
-            text-transform: uppercase;
         }
 
-        .cyber-submit:disabled {
+        .neo-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .cyber-submit:not(:disabled):hover {
+        .neo-button:not(:disabled):hover,
+        .neo-retry-button:hover {
             background: rgba(0, 255, 255, 0.2);
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
         }
 
-        .button-text {
+        .button-content {
             position: relative;
             z-index: 1;
         }
 
-        .button-glitch {
+        .button-border {
+            position: absolute;
+            inset: 0;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        /* Result Styles */
+        .neo-result-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .neo-result {
+            background: rgba(16, 24, 39, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neo-result::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 255, 255, 0.3);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
+            height: 4px;
         }
 
-        .cyber-submit:not(:disabled):hover .button-glitch {
-            transform: translateX(100%);
+        .success::before {
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+        }
+
+        .fail::before {
+            background: linear-gradient(90deg, transparent, #ff0000, transparent);
+        }
+
+        .result-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .success .result-icon {
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .fail .result-icon {
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .neo-result h2 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .neo-result p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .detail-value {
+            color: #0ff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .result-message {
+            color: white;
+            font-size: 20px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
         }
 
         @media (max-width: 768px) {
-            .cyber-grid {
+            .neo-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-details {
                 grid-template-columns: 1fr;
             }
         }
