@@ -176,55 +176,84 @@ function nextQuestion() {
 }
 
 async function submitQuiz() {
-    try {
-        const score = calculateScore();
-        console.log('Quiz score:', score);
+    if (userAnswers[currentQuestion] === undefined) {
+        alert('Please select an answer before submitting.');
+        return;
+    }
 
-        if (score >= REQUIRED_SCORE) {
+    const score = calculateScore();
+    console.log('Quiz submitted with score:', score);
+
+    if (score >= REQUIRED_SCORE) {
+        try {
             const userId = localStorage.getItem('discord_user_id');
+            console.log('User ID:', userId);
+
             if (!userId) {
-                throw new Error('Not logged in. Please login first.');
+                throw new Error('User ID not found. Please log in again.');
             }
 
-            console.log('Sending request to add role...');
+            console.log('Sending request to:', `${API_ENDPOINT}/add-role`);
+            
+            // First try the test endpoint
+            try {
+                const testResponse = await fetch(`${API_ENDPOINT}/test`);
+                console.log('Test endpoint response:', await testResponse.json());
+            } catch (testError) {
+                console.error('Test endpoint failed:', testError);
+            }
+
+            // Now try the actual role assignment
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ userId })
+                mode: 'cors',
+                body: JSON.stringify({ userId: userId })
             });
 
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
+            }
+
             const data = await response.json();
-            console.log('Server response:', data);
+            console.log('Response data:', data);
 
             if (data.success) {
-                alert('Čestitamo! Uspješno ste položili test i dobili ulogu!');
+                displayMessage(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`, 'success');
             } else {
-                throw new Error(data.error || 'Failed to assign role');
+                throw new Error(data.error || 'Greška pri dodjeljivanju uloge');
             }
-        } else {
-            alert(`Niste prošli test. Rezultat: ${score}/${questions.length}`);
+        } catch (error) {
+            console.error('Role assignment error:', error);
+            displayMessage(`Test je položen (${score}/${questions.length}), ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ${error.message}\n\nMolimo kontaktirajte administratora.`, 'error');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
+    } else {
+        displayMessage(`Niste prošli test. Rezultat: ${score}/${questions.length}. Potrebno je ${REQUIRED_SCORE} točnih odgovora.`, 'error');
     }
 }
 
-// Test function to check if bot is accessible
-async function testBot() {
+// Add this function to test connectivity
+async function testConnection() {
     try {
         const response = await fetch(`${API_ENDPOINT}/test`);
         const data = await response.json();
-        console.log('Bot test response:', data);
+        console.log('Connection test result:', data);
+        return true;
     } catch (error) {
-        console.error('Bot test failed:', error);
+        console.error('Connection test failed:', error);
+        return false;
     }
 }
 
-// Call test function when page loads
-window.addEventListener('load', testBot);
+// Test connection when page loads
+window.addEventListener('load', testConnection);
 
 // Update the window load event listener
 window.addEventListener('load', async () => {
