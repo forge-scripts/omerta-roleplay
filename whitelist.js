@@ -230,6 +230,36 @@ window.addEventListener('load', async () => {
     }
 });
 
+function finishQuiz() {
+    const passingScore = Math.ceil(questions.length * 0.8);
+    const passed = score >= passingScore;
+
+    if (passed) {
+        // Send request to add role
+        fetch('http://digi.pylex.xyz:9990/assign-role', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: window.discordUserId,
+                accessToken: window.discordAccessToken
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add role');
+            }
+            console.log('Role added successfully');
+        })
+        .catch(error => {
+            console.error('Error adding role:', error);
+        });
+    }
+
+    // Your existing results display code here
+}
+
 function showCooldown(remainingTime) {
     document.getElementById('quiz-section').classList.remove('active');
     document.getElementById('cooldown-section').classList.add('active');
