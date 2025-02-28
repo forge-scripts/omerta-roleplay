@@ -106,14 +106,13 @@
     </footer>
 
     <script>
-        // Discord OAuth2 Configuration
-        const CLIENT_ID = '1238809630008938496';
-        const REDIRECT_URI = encodeURIComponent('https://benjy244.github.io/omerta-roleplay/whitelist.html');
-
         function discordLogin() {
+            const clientId = '1238809630008938496';
+            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+            
             const params = new URLSearchParams({
-                client_id: CLIENT_ID,
-                redirect_uri: REDIRECT_URI,
+                client_id: clientId,
+                redirect_uri: redirectUri,
                 response_type: 'token',
                 scope: 'identify guilds.join',
                 prompt: 'consent'
@@ -122,58 +121,8 @@
             window.location.href = `https://discord.com/oauth2/authorize?${params}`;
         }
 
-        // Handle authentication response
-        window.onload = async function() {
-            const fragment = new URLSearchParams(window.location.hash.slice(1));
-            const accessToken = fragment.get('access_token');
-            const error = fragment.get('error');
-
-            if (error) {
-                showError('Failed to authenticate with Discord. Please try again.');
-                return;
-            }
-
-            if (accessToken) {
-                try {
-                    const response = await fetch('https://discord.com/api/users/@me', {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to get user data');
-                    }
-
-                    const userData = await response.json();
-                    console.log('Authenticated as:', userData.username);
-                    // Here you would start the quiz...
-                } catch (error) {
-                    showError('Failed to authenticate. Please try again.');
-                }
-            }
-        };
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-
         // Initialize icons
         lucide.createIcons();
     </script>
-
-    <style>
-        .error-message {
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-    </style>
 </body>
 </html>
