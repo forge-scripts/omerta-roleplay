@@ -105,9 +105,24 @@
         </div>
     </footer>
 
-    <script src="whitelist.js"></script>
     <script>
+        function discordLogin() {
+            const clientId = '1238809630008938496';
+            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+            
+            const params = new URLSearchParams({
+                client_id: clientId,
+                redirect_uri: redirectUri,
+                response_type: 'token',
+                scope: 'identify guilds.join',
+                prompt: 'consent'
+            });
+
+            window.location.href = `https://discord.com/oauth2/authorize?${params}`;
+        }
+
+        // Initialize icons
         lucide.createIcons();
     </script>
 </body>
-</html> 
+</html>
