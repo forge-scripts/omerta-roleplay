@@ -575,8 +575,12 @@ async function submitQuiz() {
     
     const passed = score >= REQUIRED_SCORE;
     
+    // Hide quiz section
     document.getElementById('quiz-section').style.display = 'none';
-    document.getElementById('result-section').style.display = 'block';
+    
+    // Clear any previous results
+    document.getElementById('success-result').style.display = 'none';
+    document.getElementById('fail-result').style.display = 'none';
     
     if (passed) {
         try {
@@ -590,31 +594,72 @@ async function submitQuiz() {
                 })
             });
 
+            if (!response.ok) {
+                throw new Error('Server responded with status: ' + response.status);
+            }
+
             const data = await response.json();
 
             if (!data.success) {
                 throw new Error(data.error || 'Failed to assign role');
             }
 
+            // Show only success message
             document.getElementById('success-result').style.display = 'block';
-            document.getElementById('fail-result').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+            
+            // Update status displays
+            document.querySelector('.status-value').textContent = 'VERIFIED';
+            document.querySelector('.role-value').textContent = 'DODIJELJENA';
+            
         } catch (error) {
             console.error('Role assignment error:', error);
-            const errorMessage = document.querySelector('.result-message');
-            if (errorMessage) {
-                errorMessage.innerHTML = `
-                    Test je položen, ali došlo je do greške pri dodjeljivanju uloge.<br>
-                    Greška: ${error.message}<br>
-                    Molimo kontaktirajte administratora.
-                `;
-                errorMessage.style.color = '#ff6b6b';
-            }
+            
+            // Show success but with error message
+            document.getElementById('success-result').style.display = 'block';
+            document.getElementById('result-section').style.display = 'block';
+            
+            // Update error message
+            const errorBox = document.createElement('div');
+            errorBox.className = 'error-box';
+            errorBox.innerHTML = `
+                <div class="error-content">
+                    <p>Test je položen, ali došlo je do greške pri dodjeljivanju uloge.</p>
+                    <p>Greška: ${error.message}</p>
+                    <p>Molimo kontaktirajte administratora.</p>
+                </div>
+            `;
+            
+            document.getElementById('success-result').appendChild(errorBox);
         }
     } else {
-        document.getElementById('success-result').style.display = 'none';
+        // Show only fail message
         document.getElementById('fail-result').style.display = 'block';
+        document.getElementById('result-section').style.display = 'block';
     }
 }
+
+// Add some CSS for better error display
+const style = document.createElement('style');
+style.textContent = `
+    .error-box {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        border-radius: 8px;
+    }
+
+    .error-content {
+        color: #ff6b6b;
+        text-align: center;
+    }
+
+    .error-content p {
+        margin: 5px 0;
+    }
+`;
+document.head.appendChild(style);
 
 // Make functions available globally
 window.loginWithDiscord = loginWithDiscord;
