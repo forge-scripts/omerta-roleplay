@@ -1,7 +1,7 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URL = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const DISCORD_ROLE_ID = '1344671671377858590';
-const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
+const API_ENDPOINT = 'http://digi.pylex.xyz:3000';
 
 const questions = [
     {
