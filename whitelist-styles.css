@@ -1,0 +1,12 @@
+.whitelist-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: #e5e7eb;
+}
+
+/* Rest of the CSS from the previous whitelist-styles.css file */ 
