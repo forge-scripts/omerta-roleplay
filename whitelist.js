@@ -182,7 +182,7 @@ async function submitQuiz() {
     }
 
     const score = calculateScore();
-    console.log('Quiz submitted with score:', score); // Debug log
+    console.log('Quiz submitted with score:', score);
 
     if (score >= REQUIRED_SCORE) {
         try {
@@ -191,7 +191,11 @@ async function submitQuiz() {
                 throw new Error('User ID not found. Please log in again.');
             }
 
-            console.log('Attempting to assign role for user:', userId); // Debug log
+            console.log('Attempting to assign role with data:', {
+                userId: userId,
+                guildId: DISCORD_CLIENT_ID,
+                roleId: DISCORD_ROLE_ID
+            });
 
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
@@ -200,18 +204,18 @@ async function submitQuiz() {
                 },
                 body: JSON.stringify({ 
                     userId: userId,
-                    guildId: DISCORD_CLIENT_ID, // Add server ID
-                    roleId: DISCORD_ROLE_ID    // Add role ID
+                    guildId: DISCORD_CLIENT_ID,
+                    roleId: DISCORD_ROLE_ID
                 })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Server error');
-            }
-
+            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Role assignment response:', data); // Debug log
+            console.log('Response data:', data);
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Server error');
+            }
 
             if (data.success) {
                 displayMessage(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`, 'success');
