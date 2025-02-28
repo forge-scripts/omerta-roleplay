@@ -978,4 +978,104 @@ footer {
 
 .package-content form {
     width: 100%;
+}
+
+/* Rules Page Styles */
+.rules-page {
+    padding-top: 80px;
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.rules-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.rules-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text);
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.rules-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.rules-section {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--card-border);
+}
+
+.rules-section h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+}
+
+.rule-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.rule-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.rule-item h3 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rule-item p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Hover effects */
+.rules-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rules-title {
+        font-size: 2rem;
+    }
+
+    .rules-section {
+        padding: 1.5rem;
+    }
+
+    .rules-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .rule-item h3 {
+        font-size: 1.1rem;
+    }
 } 
