@@ -129,57 +129,246 @@ function showError(message) {
 }
 
 function startQuiz() {
-    // Hide login section and show quiz section
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('quiz-section').style.display = 'block';
     
-    // Create quiz HTML
     const quizSection = document.getElementById('quiz-section');
     quizSection.innerHTML = `
-        <div class="quiz-container" id="quiz-container">
+        <div class="quiz-container">
+            <div class="progress-bar">
+                <div class="progress-text">0/${questions.length} Questions</div>
+                <div class="progress-fill"></div>
+            </div>
             ${questions.map((q, i) => `
-                <div class="question-box">
-                    <h4>Pitanje ${i + 1}</h4>
-                    <p>${q.question}</p>
-                    <div class="options">
-                        ${q.options.map((opt, j) => `
-                            <label class="option">
-                                <input type="radio" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
-                                <div class="option-content">
-                                    <i data-lucide="circle" class="unchecked-icon"></i>
-                                    <i data-lucide="check-circle" class="checked-icon"></i>
-                                    <span>${opt}</span>
+                <div class="question-card" data-question="${i}">
+                    <div class="question-number">
+                        <span class="cyber-text">#${(i + 1).toString().padStart(2, '0')}</span>
+                    </div>
+                    <div class="question-content">
+                        <h3 class="cyber-question">${q.question}</h3>
+                        <div class="options-grid">
+                            ${q.options.map((opt, j) => `
+                                <div class="option-card">
+                                    <input type="radio" id="q${i}a${j}" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
+                                    <label for="q${i}a${j}" class="cyber-option">
+                                        <div class="option-border"></div>
+                                        <div class="option-content">
+                                            <span class="option-number">${String.fromCharCode(65 + j)}</span>
+                                            <span class="option-text">${opt}</span>
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             `).join('')}
-            <button id="submitQuiz" onclick="submitQuiz()" disabled>Predaj Test</button>
+            <button id="submitQuiz" onclick="submitQuiz()" class="cyber-button" disabled>
+                <span class="cyber-button-text">PREDAJ TEST</span>
+                <div class="cyber-button-glitch"></div>
+            </button>
         </div>
     `;
 
-    // Initialize Lucide icons
-    lucide.createIcons();
-    
-    // Make sure submit button starts disabled
-    document.getElementById('submitQuiz').disabled = true;
+    // Add this CSS to your whitelist-styles.css
+    const style = document.createElement('style');
+    style.textContent = `
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .progress-bar {
+            background: rgba(0, 255, 255, 0.1);
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: cyan;
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px cyan;
+        }
+
+        .progress-text {
+            position: absolute;
+            right: 0;
+            top: -25px;
+            color: cyan;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .question-card {
+            background: rgba(16, 24, 39, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .question-number {
+            margin-bottom: 15px;
+        }
+
+        .cyber-text {
+            color: cyan;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .cyber-question {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .option-card {
+            position: relative;
+        }
+
+        .option-card input[type="radio"] {
+            display: none;
+        }
+
+        .cyber-option {
+            display: block;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-border {
+            position: absolute;
+            inset: 0;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-option:hover .option-border {
+            border-color: cyan;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .option-card input[type="radio"]:checked + .cyber-option {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: cyan;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .option-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option-number {
+            color: cyan;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .option-text {
+            color: white;
+            font-size: 16px;
+        }
+
+        .cyber-button {
+            width: 100%;
+            padding: 15px 30px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid cyan;
+            border-radius: 8px;
+            color: cyan;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .cyber-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .cyber-button:not(:disabled):hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .cyber-button-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cyber-button-glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 255, 255, 0.3);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .cyber-button:not(:disabled):hover .cyber-button-glitch {
+            transform: translateX(100%);
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 window.handleAnswer = function(questionIndex, answerIndex) {
     userAnswers[questionIndex] = answerIndex;
     
-    const questionOptions = document.querySelectorAll(`input[name="q${questionIndex}"]`);
-    questionOptions.forEach((option, index) => {
-        const label = option.closest('.option');
-        if (index === answerIndex) {
-            label.classList.add('selected');
-        } else {
-            label.classList.remove('selected');
-        }
-    });
+    // Update progress bar
+    const answered = userAnswers.filter(answer => answer !== null).length;
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+    
+    if (progressFill && progressText) {
+        progressFill.style.width = `${(answered / questions.length) * 100}%`;
+        progressText.textContent = `${answered}/${questions.length} Questions`;
+    }
 
-    document.getElementById('submitQuiz').disabled = userAnswers.includes(null);
+    // Enable submit button if all questions are answered
+    const submitButton = document.getElementById('submitQuiz');
+    if (submitButton) {
+        submitButton.disabled = userAnswers.includes(null);
+    }
 };
 
 // Check for authentication response on page load
