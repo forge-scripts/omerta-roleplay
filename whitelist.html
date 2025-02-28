@@ -12,16 +12,16 @@
 <body>
     <div class="whitelist-container">
         <div class="whitelist-box">
-            <div id="login-section" class="whitelist-section active">
+            <div id="login-section" class="whitelist-section">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
-                <button class="discord-auth-btn" onclick="loginWithDiscord()">
+                <button onclick="loginWithDiscord()" class="discord-auth-btn">
                     <i data-lucide="message-square"></i>
                     Prijavi se preko Discorda
                 </button>
             </div>
             
-            <div id="quiz-section" class="whitelist-section">
+            <div id="quiz-section" class="whitelist-section" style="display: none;">
                 <h2>Roleplay Kviz</h2>
                 <p>Odgovorite točno na sljedeća pitanja za pristup serveru</p>
                 <div id="quiz-container"></div>
@@ -30,7 +30,7 @@
                 </button>
             </div>
             
-            <div id="result-section" class="whitelist-section">
+            <div id="result-section" class="whitelist-section" style="display: none;">
                 <div id="success-result" class="result-box">
                     <i data-lucide="check-circle"></i>
                     <h3>Čestitamo!</h3>
@@ -44,19 +44,10 @@
             </div>
         </div>
     </div>
+
     <script src="whitelist.js"></script>
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
-        
-        // Debug check to ensure the function exists
-        console.log('Login function exists:', typeof loginWithDiscord === 'function');
-        
-        // Add click event listener as backup
-        document.querySelector('.discord-auth-btn').addEventListener('click', function() {
-            console.log('Button clicked via event listener');
-            loginWithDiscord();
-        });
     </script>
 </body>
 </html>
