@@ -115,7 +115,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://i.imgur.com/J8131CJ.jpg') no-repeat center center;
+    background: url('https://i.imgur.com/J8131CJ.jpg') no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
     position: relative;
@@ -181,7 +181,6 @@ body {
 
 .cta-primary:hover {
     background: var(--primary-dark);
-    transform: translateY(-2px);
     box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.6);
 }
 
@@ -194,7 +193,6 @@ body {
 
 .cta-secondary:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
 }
 
 /* Features Section */
