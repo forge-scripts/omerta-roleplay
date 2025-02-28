@@ -105,29 +105,52 @@ const questions = [
     }
 ];
 
-const REQUIRED_SCORE = 8; // Minimum 8 correct answers to pass
+const REQUIRED_SCORE = 8;
 let userAnswers = new Array(questions.length).fill(null);
 let currentUserId = null;
 
-window.loginWithDiscord = function() {
+// Simplified login function
+function loginWithDiscord() {
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
-        redirect_url: DISCORD_REDIRECT_URL,
+        redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'token',
-        scope: 'identify guilds.join',
+        scope: 'identify',
         prompt: 'consent'
     });
 
     window.location.href = `https://discord.com/oauth2/authorize?${params}`;
-};
-
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    document.querySelector('.whitelist-box').appendChild(errorDiv);
-    setTimeout(() => errorDiv.remove(), 5000);
 }
+
+// Simplified authentication check
+window.addEventListener('load', async () => {
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = fragment.get('access_token');
+    
+    if (accessToken) {
+        try {
+            const userResponse = await fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            if (!userResponse.ok) {
+                throw new Error('Failed to get user info');
+            }
+
+            const userData = await userResponse.json();
+            currentUserId = userData.id;
+            console.log('Auth successful:', userData.username);
+            startQuiz();
+        } catch (error) {
+            console.error('Auth error:', error);
+            document.getElementById('login-section').style.display = 'block';
+        }
+    } else {
+        document.getElementById('login-section').style.display = 'block';
+    }
+});
 
 function startQuiz() {
     document.getElementById('login-section').style.display = 'none';
@@ -137,11 +160,11 @@ function startQuiz() {
     quizSection.innerHTML = `
         <div class="quiz-container">
             <div class="progress-bar">
-                <div class="progress-text">0/${questions.length} Questions</div>
+                <div class="progress-text">0/${questions.length} Pitanja</div>
                 <div class="progress-fill"></div>
             </div>
             ${questions.map((q, i) => `
-                <div class="question-card" data-question="${i}">
+                <div class="question-card">
                     <div class="question-number">
                         <span class="cyber-text">#${(i + 1).toString().padStart(2, '0')}</span>
                     </div>
@@ -164,372 +187,48 @@ function startQuiz() {
                     </div>
                 </div>
             `).join('')}
-            <button id="submitQuiz" onclick="submitQuiz()" class="cyber-button" disabled>
+            <button onclick="submitQuiz()" id="submitQuiz" class="cyber-button" disabled>
                 <span class="cyber-button-text">PREDAJ TEST</span>
                 <div class="cyber-button-glitch"></div>
             </button>
         </div>
     `;
-
-    // Add this CSS to your whitelist-styles.css
-    const style = document.createElement('style');
-    style.textContent = `
-        .quiz-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .progress-bar {
-            background: rgba(0, 255, 255, 0.1);
-            height: 10px;
-            border-radius: 5px;
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .progress-fill {
-            background: cyan;
-            height: 100%;
-            width: 0%;
-            border-radius: 5px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px cyan;
-        }
-
-        .progress-text {
-            position: absolute;
-            right: 0;
-            top: -25px;
-            color: cyan;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .question-card {
-            background: rgba(16, 24, 39, 0.8);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .question-number {
-            margin-bottom: 15px;
-        }
-
-        .cyber-text {
-            color: cyan;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        .cyber-question {
-            color: white;
-            font-size: 20px;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .option-card {
-            position: relative;
-        }
-
-        .option-card input[type="radio"] {
-            display: none;
-        }
-
-        .cyber-option {
-            display: block;
-            padding: 15px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .option-border {
-            position: absolute;
-            inset: 0;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .cyber-option:hover .option-border {
-            border-color: cyan;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        }
-
-        .option-card input[type="radio"]:checked + .cyber-option {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: cyan;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-        }
-
-        .option-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .option-number {
-            color: cyan;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .option-text {
-            color: white;
-            font-size: 16px;
-        }
-
-        .cyber-button {
-            width: 100%;
-            padding: 15px 30px;
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid cyan;
-            border-radius: 8px;
-            color: cyan;
-            font-size: 18px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            margin-top: 30px;
-        }
-
-        .cyber-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .cyber-button:not(:disabled):hover {
-            background: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .cyber-button-text {
-            position: relative;
-            z-index: 1;
-        }
-
-        .cyber-button-glitch {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 255, 255, 0.3);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-
-        .cyber-button:not(:disabled):hover .cyber-button-glitch {
-            transform: translateX(100%);
-        }
-
-        @media (max-width: 768px) {
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 }
 
-window.handleAnswer = function(questionIndex, answerIndex) {
+function handleAnswer(questionIndex, answerIndex) {
     userAnswers[questionIndex] = answerIndex;
     
-    // Update progress bar
     const answered = userAnswers.filter(answer => answer !== null).length;
     const progressFill = document.querySelector('.progress-fill');
     const progressText = document.querySelector('.progress-text');
     
     if (progressFill && progressText) {
         progressFill.style.width = `${(answered / questions.length) * 100}%`;
-        progressText.textContent = `${answered}/${questions.length} Questions`;
+        progressText.textContent = `${answered}/${questions.length} Pitanja`;
     }
 
-    // Enable submit button if all questions are answered
-    const submitButton = document.getElementById('submitQuiz');
-    if (submitButton) {
-        submitButton.disabled = userAnswers.includes(null);
-    }
-};
-
-// Check for authentication response on page load
-window.addEventListener('load', async () => {
-    try {
-        const fragment = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = fragment.get('access_token');
-        const error = fragment.get('error');
-        
-        if (error) {
-            console.error('Discord auth error:', error);
-            showError('Authentication failed. Please try again.');
-            document.getElementById('login-section').style.display = 'block';
-            return;
-        }
-        
-        if (accessToken) {
-            try {
-                // Test the token first
-                console.log('Attempting to verify token...');
-                
-                const userResponse = await fetch('https://discord.com/api/users/@me', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!userResponse.ok) {
-                    throw new Error(`Discord API error: ${userResponse.status}`);
-                }
-
-                const userData = await userResponse.json();
-                currentUserId = userData.id;
-                console.log('Successfully authenticated user:', userData.username);
-
-                // Skip cooldown check for now and start quiz directly
-                startQuiz();
-                
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showError('Failed to authenticate. Please try again.');
-                document.getElementById('login-section').style.display = 'block';
-            }
-        } else {
-            // No access token, show login
-            document.getElementById('login-section').style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Critical error:', error);
-        showError('An unexpected error occurred. Please try again.');
-        document.getElementById('login-section').style.display = 'block';
-    }
-});
-
-function showCooldown(remainingTime) {
-    document.getElementById('quiz-section').classList.remove('active');
-    document.getElementById('cooldown-section').classList.add('active');
-    
-    const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-    const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-    
-    document.getElementById('cooldown-timer').textContent = 
-        `${hours}h ${minutes}m`;
+    document.getElementById('submitQuiz').disabled = userAnswers.includes(null);
 }
 
-async function submitQuiz() {
+function submitQuiz() {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
     
     const passed = score >= REQUIRED_SCORE;
     
-    try {
-        // Show results immediately
-        document.getElementById('quiz-section').style.display = 'none';
-        
-        if (passed) {
-            document.getElementById('success-result').style.display = 'block';
-            document.getElementById('fail-result').style.display = 'none';
-        } else {
-            document.getElementById('success-result').style.display = 'none';
-            document.getElementById('fail-result').style.display = 'block';
-        }
-
-        // Try to send results to API
-        const response = await fetch(`${API_ENDPOINT}/assign-role`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: currentUserId,
-                passed: passed
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update role status');
-        }
-
-    } catch (error) {
-        console.error('Error in submit:', error);
-        // Show error but don't block the results
-        showError('Role assignment may have failed. Please contact an administrator.');
-    }
-}
-
-// Add this helper function to check if the API is available
-async function checkApiAvailability() {
-    try {
-        const response = await fetch(`${API_ENDPOINT}/health`);
-        return response.ok;
-    } catch (error) {
-        console.error('API check failed:', error);
-        return false;
-    }
-}
-    document.getElementById('quiz-section').classList.remove('active');
-    document.getElementById('result-section').classList.add('active');
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('result-section').style.display = 'block';
     
     if (passed) {
         document.getElementById('success-result').style.display = 'block';
         document.getElementById('fail-result').style.display = 'none';
-        
-        try {
-            const response = await fetch(`${API_ENDPOINT}/assign-role`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    passed: true
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to assign role');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showError('Failed to assign role. Please contact an administrator.');
-        }
     } else {
         document.getElementById('success-result').style.display = 'none';
         document.getElementById('fail-result').style.display = 'block';
-        
-        try {
-            await fetch(`${API_ENDPOINT}/assign-role`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    passed: false
-                })
-            });
-        } catch (error) {
-            console.error('Error:', error);
-        }
     }
-});
+}
+
+// Make functions available globally
+window.loginWithDiscord = loginWithDiscord;
+window.handleAnswer = handleAnswer;
+window.submitQuiz = submitQuiz;
