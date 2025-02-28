@@ -1,4 +1,5 @@
-// Discord OAuth2 Configuration
+function loginWithDiscord() {
+    alert('Button clicked!');
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
