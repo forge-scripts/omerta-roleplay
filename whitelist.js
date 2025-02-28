@@ -187,26 +187,27 @@ async function submitQuiz() {
     if (score >= REQUIRED_SCORE) {
         try {
             const userId = localStorage.getItem('discord_user_id');
+            console.log('User ID from localStorage:', userId);
+
             if (!userId) {
                 throw new Error('User ID not found. Please log in again.');
             }
 
-            console.log('Attempting to assign role with data:', {
+            const requestData = {
                 userId: userId,
                 guildId: DISCORD_CLIENT_ID,
                 roleId: DISCORD_ROLE_ID
-            });
+            };
+
+            console.log('Sending request to:', `${API_ENDPOINT}/add-role`);
+            console.log('Request data:', requestData);
 
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    userId: userId,
-                    guildId: DISCORD_CLIENT_ID,
-                    roleId: DISCORD_ROLE_ID
-                })
+                body: JSON.stringify(requestData)
             });
 
             console.log('Response status:', response.status);
