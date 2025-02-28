@@ -31,17 +31,24 @@
     <script>
         function loginWithDiscord() {
             const clientId = '1238809630008938496';
-            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+            const redirectUri = 'https://benjy244.github.io/Omerta-Roleplay/whitelist.html';
             
-            const params = new URLSearchParams({
-                client_id: clientId,
-                redirect_uri: redirectUri,
-                response_type: 'token',
-                scope: 'identify',
-                prompt: 'consent'
-            });
+            try {
+                const params = new URLSearchParams({
+                    client_id: clientId,
+                    redirect_uri: redirectUri,
+                    response_type: 'token',
+                    scope: 'identify',
+                    prompt: 'consent'
+                });
 
-            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+                const authUrl = 'https://discord.com/oauth2/authorize?' + params.toString();
+                console.log('Auth URL:', authUrl); // For debugging
+                window.location.href = authUrl;
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('An error occurred during login. Please try again.');
+            }
         }
 
         window.onload = async function() {
@@ -158,23 +165,4 @@
 
         .error-message {
             background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        h2 {
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: #a1a1aa;
-            margin-bottom: 1.5rem;
-        }
-    </style>
-</body>
-</html>
+            border
