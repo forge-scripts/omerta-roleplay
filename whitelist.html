@@ -31,37 +31,21 @@
     <script>
         function loginWithDiscord() {
             const clientId = '1238809630008938496';
-            const redirectUrl = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
             
-            try {
-                const params = new URLSearchParams({
-                    client_id: clientId,
-                    redirect_uri: redirectUri,
-                    response_type: 'token',
-                    scope: 'identify guilds.join',
-                    prompt: 'consent'
-                });
+            const url = `https://discord.com/oauth2/authorize` +
+                `?client_id=${clientId}` +
+                `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+                `&response_type=token` +
+                `&scope=identify`;
 
-                const authUrl = 'https://discord.com/oauth2/authorize?' + params.toString();
-                console.log('Auth URL:', authUrl);
-                window.location.href = authUrl;
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('An error occurred during login. Please try again.');
-            }
+            window.location.href = url;
         }
 
         window.onload = async function() {
-            try {
-                const fragment = new URLSearchParams(window.location.hash.slice(1));
-                const accessToken = fragment.get('access_token');
-                const error = fragment.get('error');
-
-                if (error) {
-                    showError('Authentication failed. Please try again.');
-                    return;
-                }
-
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const accessToken = new URLSearchParams(hash).get('access_token');
                 if (accessToken) {
                     try {
                         const response = await fetch('https://discord.com/api/users/@me', {
@@ -77,55 +61,25 @@
                         const userData = await response.json();
                         console.log('Logged in as:', userData.username);
                         
-                        // Store the access token for later use
+                        // Store Discord data for the quiz
                         window.discordAccessToken = accessToken;
                         window.discordUserId = userData.id;
                         
+                        // Hide login and show quiz
                         document.getElementById('login-section').style.display = 'none';
                         document.getElementById('quiz-section').style.display = 'block';
                         
-                        // Start the quiz from whitelist.js
+                        // Start the quiz
                         if (typeof startQuiz === 'function') {
                             startQuiz();
-                        } else {
-                            console.error('startQuiz function not found in whitelist.js');
-                            showError('Failed to load quiz. Please refresh the page.');
                         }
                     } catch (error) {
-                        console.error('Error fetching user data:', error);
-                        showError('Failed to get user data. Please try again.');
+                        console.error('Error:', error);
+                        showError('An error occurred during login. Please try again.');
                     }
                 }
-            } catch (error) {
-                console.error('Auth error:', error);
-                showError('An error occurred. Please try again.');
             }
         };
-
-        // Function to be called from whitelist.js when quiz is passed
-        async function onQuizPassed() {
-            try {
-                const response = await fetch('http://digi.pylex.xyz:9990/add-role', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: window.discordUserId,
-                        accessToken: window.discordAccessToken
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to add role');
-                }
-
-                console.log('Role added successfully');
-            } catch (error) {
-                console.error('Error adding role:', error);
-                showError('Failed to add role. Please contact an administrator.');
-            }
-        }
 
         function showError(message) {
             const errorDiv = document.getElementById('error-message');
