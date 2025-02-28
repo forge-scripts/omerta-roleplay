@@ -328,7 +328,7 @@ function loginWithDiscord() {
     
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URL, // Note: using DISCORD_REDIRECT_URL here
+        redirect_url: DISCORD_REDIRECT_URL, // Note: using DISCORD_REDIRECT_URL here
         response_type: 'token',
         scope: 'identify',
         prompt: 'consent'
