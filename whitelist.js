@@ -1,6 +1,10 @@
+// Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496';
+// Update this to match your exact GitHub Pages URL
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
+const GUILD_ID = '1344671429924360202';
+const WHITELIST_ROLE_ID = '1344671671377858590';
 
 const questions = [
     {
@@ -109,16 +113,30 @@ const REQUIRED_SCORE = 8; // Minimum 8 correct answers to pass
 let userAnswers = new Array(questions.length).fill(null);
 let currentUserId = null;
 
-window.loginWithDiscord = function() {
+// Simplified login function
+function loginWithDiscord() {
+    // Debug log
+    console.log('Login button clicked');
+    
+    // Create Discord OAuth2 URL
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'token',
-        scope: 'identify guilds.join'
+        scope: 'identify guilds.join',
+        prompt: 'consent'
     });
 
-    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
-};
+    // Construct and log the auth URL
+    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    console.log('Auth URL:', authUrl);
+    
+    // Redirect to Discord
+    window.location.href = authUrl;
+}
+
+// Make function globally available
+window.loginWithDiscord = loginWithDiscord;
 
 function showError(message) {
     const errorDiv = document.createElement('div');
