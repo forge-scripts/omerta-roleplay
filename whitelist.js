@@ -182,36 +182,48 @@ async function submitQuiz() {
     }
 
     const score = calculateScore();
-    const passingScore = Math.floor(questions.length * 0.8); // 80% passing threshold
+    console.log('Quiz submitted with score:', score); // Debug log
 
-    if (score >= passingScore) {
+    if (score >= REQUIRED_SCORE) {
         try {
             const userId = localStorage.getItem('discord_user_id');
             if (!userId) {
                 throw new Error('User ID not found. Please log in again.');
             }
 
+            console.log('Attempting to assign role for user:', userId); // Debug log
+
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ userId: userId })
+                body: JSON.stringify({ 
+                    userId: userId,
+                    guildId: DISCORD_CLIENT_ID, // Add server ID
+                    roleId: DISCORD_ROLE_ID    // Add role ID
+                })
             });
 
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server error');
+            }
+
             const data = await response.json();
+            console.log('Role assignment response:', data); // Debug log
 
             if (data.success) {
-                displayMessage(`Congratulations! You passed the test (${score}/${questions.length}) and received the role!`, 'success');
+                displayMessage(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`, 'success');
             } else {
-                throw new Error(data.error || 'Failed to assign role');
+                throw new Error(data.error || 'Greška pri dodjeljivanju uloge');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Role assignment error:', error);
             displayMessage(`Test je položen (${score}/${questions.length}), ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ${error.message}\n\nMolimo kontaktirajte administratora.`, 'error');
         }
     } else {
-        displayMessage(`You did not pass the test. Score: ${score}/${questions.length}. You need ${passingScore} correct answers to pass.`, 'error');
+        displayMessage(`Niste prošli test. Rezultat: ${score}/${questions.length}. Potrebno je ${REQUIRED_SCORE} točnih odgovora.`, 'error');
     }
 }
 
