@@ -308,6 +308,13 @@ body {
     margin: 0 auto;
 }
 
+/* For larger screens, show 3 cards per row */
+@media (min-width: 1024px) {
+    .rules-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 .rule {
     background: var(--card-bg);
     padding: 2rem;
