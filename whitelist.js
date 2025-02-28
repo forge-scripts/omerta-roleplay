@@ -3,9 +3,24 @@ const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
 
-let userAnswers = new Array(questions.length).fill(null);
-let currentUserId = null;
+// Make sure this function is available in the global scope
+function loginWithDiscord() {
+    console.log('Login button clicked'); // Debug log
+    
+    const params = new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID,
+        redirect_uri: DISCORD_REDIRECT_URI,
+        response_type: 'token',
+        scope: 'identify',
+        prompt: 'consent'
+    });
 
+    const authUrl = 'https://discord.com/oauth2/authorize?' + params.toString();
+    console.log('Auth URL:', authUrl); // Debug log
+    window.location.href = authUrl;
+}
+
+// Rest of your code...
 // Simplified Discord login function
 window.loginWithDiscord = function() {
     const params = {
