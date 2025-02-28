@@ -579,45 +579,35 @@ async function submitQuiz() {
     document.getElementById('result-section').style.display = 'block';
     
     if (passed) {
-        document.getElementById('success-result').style.display = 'block';
-        document.getElementById('fail-result').style.display = 'none';
-        
         try {
-            // Get the access token from localStorage or URL fragment
-            const fragment = new URLSearchParams(window.location.hash.slice(1));
-            const accessToken = fragment.get('access_token');
-            
-            // Send request to your backend to assign the role
             const response = await fetch('http://digi.pylex.xyz:9990/add-role', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    userId: currentUserId,
-                    roleId: '1344671671377858590', // Your specified role ID
-                    accessToken: accessToken,
-                    passed: true
+                    userId: currentUserId
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to assign role');
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to assign role');
             }
 
-            const result = await response.json();
-            console.log('Role assignment result:', result);
-
+            document.getElementById('success-result').style.display = 'block';
+            document.getElementById('fail-result').style.display = 'none';
         } catch (error) {
             console.error('Role assignment error:', error);
-            // Show error message but keep success screen
-            const resultMessage = document.querySelector('.result-message');
-            if (resultMessage) {
-                resultMessage.innerHTML = `
+            const errorMessage = document.querySelector('.result-message');
+            if (errorMessage) {
+                errorMessage.innerHTML = `
                     Test je položen, ali došlo je do greške pri dodjeljivanju uloge.<br>
+                    Greška: ${error.message}<br>
                     Molimo kontaktirajte administratora.
                 `;
-                resultMessage.style.color = '#ffaa00';
+                errorMessage.style.color = '#ff6b6b';
             }
         }
     } else {
