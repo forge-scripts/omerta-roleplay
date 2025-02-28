@@ -1,7 +1,7 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URL = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const DISCORD_ROLE_ID = '1344671671377858590';
-const API_ENDPOINT = 'http://digi.pylex.xyz:3000';
+const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
 
 const questions = [
     {
@@ -187,27 +187,18 @@ async function submitQuiz() {
     if (score >= REQUIRED_SCORE) {
         try {
             const userId = localStorage.getItem('discord_user_id');
-            console.log('User ID from localStorage:', userId);
+            console.log('Attempting to assign role for user:', userId);
 
             if (!userId) {
                 throw new Error('User ID not found. Please log in again.');
             }
-
-            const requestData = {
-                userId: userId,
-                guildId: DISCORD_CLIENT_ID,
-                roleId: DISCORD_ROLE_ID
-            };
-
-            console.log('Sending request to:', `${API_ENDPOINT}/add-role`);
-            console.log('Request data:', requestData);
 
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestData)
+                body: JSON.stringify({ userId: userId })
             });
 
             console.log('Response status:', response.status);
