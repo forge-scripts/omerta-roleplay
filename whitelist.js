@@ -129,6 +129,7 @@ function selectAnswer(answerIndex) {
 }
 
 function showQuestion() {
+    console.log('Showing question:', currentQuestion); // Debug log
     const questionContainer = document.getElementById('question-container');
     if (!questionContainer) {
         console.error('Question container not found!');
@@ -227,16 +228,19 @@ function displayMessage(message, type) {
     messageDiv.style.display = 'block';
 }
 
-// Start the quiz when the page loads
-function startQuiz() {
-    currentQuestion = 0;
-    userAnswers = new Array(questions.length).fill(null);
-    document.getElementById('quiz-section').style.display = 'block';
-    showQuestion();
-}
-
-// Make sure to call startQuiz when the page loads
+// Update the window load event listener
 window.addEventListener('load', async () => {
+    console.log('Page loaded'); // Debug log
+    
+    // First, make sure quiz section exists and is hidden initially
+    const quizSection = document.getElementById('quiz-section');
+    const loginSection = document.getElementById('login-section');
+    
+    if (!quizSection || !loginSection) {
+        console.error('Required sections not found!');
+        return;
+    }
+
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const accessToken = fragment.get('access_token');
     
@@ -257,20 +261,47 @@ window.addEventListener('load', async () => {
             localStorage.setItem('discord_user_id', userData.id);
             console.log('Auth successful:', userData.username);
             
-            // Hide login section and show quiz section
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('quiz-section').style.display = 'block';
+            // Hide login, show quiz
+            loginSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            
+            // Make sure question container exists
+            if (!document.getElementById('question-container')) {
+                const questionContainer = document.createElement('div');
+                questionContainer.id = 'question-container';
+                quizSection.appendChild(questionContainer);
+            }
+            
+            // Initialize quiz
             startQuiz();
         } catch (error) {
             console.error('Auth error:', error);
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('quiz-section').style.display = 'none';
+            loginSection.style.display = 'block';
+            quizSection.style.display = 'none';
         }
     } else {
-        document.getElementById('login-section').style.display = 'block';
-        document.getElementById('quiz-section').style.display = 'none';
+        loginSection.style.display = 'block';
+        quizSection.style.display = 'none';
     }
 });
+
+function startQuiz() {
+    console.log('Starting quiz'); // Debug log
+    currentQuestion = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    
+    // Make sure quiz section and question container are visible
+    const quizSection = document.getElementById('quiz-section');
+    quizSection.style.display = 'block';
+    
+    // Clear any existing content
+    const questionContainer = document.getElementById('question-container');
+    if (questionContainer) {
+        questionContainer.innerHTML = '';
+    }
+    
+    showQuestion();
+}
 
 // Simplified login function
 function loginWithDiscord() {
@@ -311,7 +342,9 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Make functions available globally
+// Make sure all functions are available globally
 window.loginWithDiscord = loginWithDiscord;
-window.handleAnswer = selectAnswer;
+window.selectAnswer = selectAnswer;
+window.nextQuestion = nextQuestion;
 window.submitQuiz = submitQuiz;
+window.startQuiz = startQuiz;
