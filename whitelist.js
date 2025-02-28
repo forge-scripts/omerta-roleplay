@@ -1,10 +1,6 @@
-// Discord OAuth2 Configuration
 const DISCORD_CLIENT_ID = '1238809630008938496';
-// Update this to match your exact GitHub Pages URL
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
-const GUILD_ID = '1344671429924360202';
-const WHITELIST_ROLE_ID = '1344671671377858590';
 
 const questions = [
     {
@@ -113,30 +109,16 @@ const REQUIRED_SCORE = 8; // Minimum 8 correct answers to pass
 let userAnswers = new Array(questions.length).fill(null);
 let currentUserId = null;
 
-// Simplified login function
-function loginWithDiscord() {
-    // Debug log
-    console.log('Login button clicked');
-    
-    // Create Discord OAuth2 URL
+window.loginWithDiscord = function() {
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
         redirect_uri: DISCORD_REDIRECT_URI,
         response_type: 'token',
-        scope: 'identify guilds.join',
-        prompt: 'consent'
+        scope: 'identify guilds.join'
     });
 
-    // Construct and log the auth URL
-    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
-    console.log('Auth URL:', authUrl);
-    
-    // Redirect to Discord
-    window.location.href = authUrl;
-}
-
-// Make function globally available
-window.loginWithDiscord = loginWithDiscord;
+    window.location.href = `https://discord.com/oauth2/authorize?${params.toString()}`;
+};
 
 function showError(message) {
     const errorDiv = document.createElement('div');
@@ -147,31 +129,40 @@ function showError(message) {
 }
 
 function startQuiz() {
-    document.getElementById('login-section').classList.remove('active');
-    document.getElementById('quiz-section').classList.add('active');
+    // Hide login section and show quiz section
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('quiz-section').style.display = 'block';
     
-    const quizContainer = document.getElementById('quiz-container');
-    quizContainer.innerHTML = questions.map((q, i) => `
-        <div class="question-box">
-            <h4>Pitanje ${i + 1}</h4>
-            <p>${q.question}</p>
-            <div class="options">
-                ${q.options.map((opt, j) => `
-                    <label class="option">
-                        <input type="radio" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
-                        <div class="option-content">
-                            <i data-lucide="circle" class="unchecked-icon"></i>
-                            <i data-lucide="check-circle" class="checked-icon"></i>
-                            <span>${opt}</span>
-                        </div>
-                    </label>
-                `).join('')}
-            </div>
+    // Create quiz HTML
+    const quizSection = document.getElementById('quiz-section');
+    quizSection.innerHTML = `
+        <div class="quiz-container" id="quiz-container">
+            ${questions.map((q, i) => `
+                <div class="question-box">
+                    <h4>Pitanje ${i + 1}</h4>
+                    <p>${q.question}</p>
+                    <div class="options">
+                        ${q.options.map((opt, j) => `
+                            <label class="option">
+                                <input type="radio" name="q${i}" value="${j}" onchange="handleAnswer(${i}, ${j})">
+                                <div class="option-content">
+                                    <i data-lucide="circle" class="unchecked-icon"></i>
+                                    <i data-lucide="check-circle" class="checked-icon"></i>
+                                    <span>${opt}</span>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('')}
+            <button id="submitQuiz" onclick="submitQuiz()" disabled>Predaj Test</button>
         </div>
-    `).join('');
+    `;
 
+    // Initialize Lucide icons
     lucide.createIcons();
     
+    // Make sure submit button starts disabled
     document.getElementById('submitQuiz').disabled = true;
 }
 
@@ -229,36 +220,6 @@ window.addEventListener('load', async () => {
         document.getElementById('login-section').classList.add('active');
     }
 });
-
-function finishQuiz() {
-    const passingScore = Math.ceil(questions.length * 0.8);
-    const passed = score >= passingScore;
-
-    if (passed) {
-        // Send request to add role
-        fetch('http://digi.pylex.xyz:9990/assign-role', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: window.discordUserId,
-                accessToken: window.discordAccessToken
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add role');
-            }
-            console.log('Role added successfully');
-        })
-        .catch(error => {
-            console.error('Error adding role:', error);
-        });
-    }
-
-    // Your existing results display code here
-}
 
 function showCooldown(remainingTime) {
     document.getElementById('quiz-section').classList.remove('active');
