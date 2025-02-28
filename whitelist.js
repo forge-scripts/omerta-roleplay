@@ -176,69 +176,55 @@ function nextQuestion() {
 }
 
 async function submitQuiz() {
-    if (userAnswers[currentQuestion] === undefined) {
-        alert('Please select an answer before submitting.');
-        return;
-    }
+    try {
+        const score = calculateScore();
+        console.log('Quiz score:', score);
 
-    const score = calculateScore();
-    console.log('Quiz submitted with score:', score);
-
-    if (score >= REQUIRED_SCORE) {
-        try {
+        if (score >= REQUIRED_SCORE) {
             const userId = localStorage.getItem('discord_user_id');
-            console.log('Attempting to assign role for user:', userId);
-
             if (!userId) {
-                throw new Error('User ID not found. Please log in again.');
+                throw new Error('Not logged in. Please login first.');
             }
 
+            console.log('Sending request to add role...');
             const response = await fetch(`${API_ENDPOINT}/add-role`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    userId: userId,
-                    guildId: DISCORD_CLIENT_ID,
-                    roleId: DISCORD_ROLE_ID
-                })
+                body: JSON.stringify({ userId })
             });
 
-            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Response data:', data);
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Server error');
-            }
+            console.log('Server response:', data);
 
             if (data.success) {
-                displayMessage(`Čestitamo! Uspješno ste položili test (${score}/${questions.length}) i dobili ulogu!`, 'success');
+                alert('Čestitamo! Uspješno ste položili test i dobili ulogu!');
             } else {
-                throw new Error(data.error || 'Greška pri dodjeljivanju uloge');
+                throw new Error(data.error || 'Failed to assign role');
             }
-        } catch (error) {
-            console.error('Role assignment error:', error);
-            displayMessage(`Test je položen (${score}/${questions.length}), ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ${error.message}\n\nMolimo kontaktirajte administratora.`, 'error');
+        } else {
+            alert(`Niste prošli test. Rezultat: ${score}/${questions.length}`);
         }
-    } else {
-        displayMessage(`Niste prošli test. Rezultat: ${score}/${questions.length}. Potrebno je ${REQUIRED_SCORE} točnih odgovora.`, 'error');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
     }
 }
 
-function displayMessage(message, type) {
-    const resultDiv = document.getElementById('quiz-results');
-    if (!resultDiv) {
-        const newDiv = document.createElement('div');
-        newDiv.id = 'quiz-results';
-        document.body.appendChild(newDiv);
+// Test function to check if bot is accessible
+async function testBot() {
+    try {
+        const response = await fetch(`${API_ENDPOINT}/test`);
+        const data = await response.json();
+        console.log('Bot test response:', data);
+    } catch (error) {
+        console.error('Bot test failed:', error);
     }
-    const messageDiv = document.getElementById('quiz-results');
-    messageDiv.textContent = message;
-    messageDiv.className = type;
-    messageDiv.style.display = 'block';
 }
+
+// Call test function when page loads
+window.addEventListener('load', testBot);
 
 // Update the window load event listener
 window.addEventListener('load', async () => {
