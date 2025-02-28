@@ -1,5 +1,5 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
-const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
+const DISCORD_REDIRECT_URL = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 const API_ENDPOINT = 'https://digi.pylex.xyz:9990';
 
 const questions = [
@@ -111,15 +111,19 @@ let currentUserId = null;
 
 // Simplified login function
 function loginWithDiscord() {
+    console.log('Login attempt started'); // Debug log
+    
     const params = new URLSearchParams({
         client_id: DISCORD_CLIENT_ID,
-        redirect_uri: DISCORD_REDIRECT_URI,
+        redirect_uri: DISCORD_REDIRECT_URL, // Note: using DISCORD_REDIRECT_URL here
         response_type: 'token',
         scope: 'identify',
         prompt: 'consent'
     });
 
-    window.location.href = `https://discord.com/oauth2/authorize?${params}`;
+    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
+    console.log('Auth URL:', authUrl); // Debug log
+    window.location.href = authUrl;
 }
 
 // Simplified authentication check
