@@ -23,19 +23,23 @@
 
     <script>
         const CLIENT_ID = '1238809630008938496';
-        const REDIRECT_URI = encodeURIComponent('https://benjy244.github.io/omerta-roleplay/whitelist.html');
+        const REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
 
         function loginWithDiscord() {
             try {
-                const params = new URLSearchParams({
+                const params = {
                     client_id: CLIENT_ID,
                     redirect_uri: REDIRECT_URI,
                     response_type: 'token',
                     scope: 'identify guilds.join',
                     prompt: 'consent'
-                });
+                };
+                
+                const queryString = Object.entries(params)
+                    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+                    .join('&');
 
-                window.location.href = `https://discord.com/oauth2/authorize?${params}`;
+                window.location.href = `https://discord.com/oauth2/authorize?${queryString}`;
             } catch (error) {
                 console.error('Login error:', error);
                 showError('An error occurred during login. Please try again.');
