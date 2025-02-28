@@ -12,7 +12,6 @@
 <body>
     <div class="whitelist-container">
         <div class="whitelist-box">
-            <!-- Login Section -->
             <div id="login-section">
                 <h2>Whitelist Pristup</h2>
                 <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
@@ -23,9 +22,8 @@
                 <div id="error-message" style="display: none;" class="error-message"></div>
             </div>
 
-            <!-- Quiz Section (Initially Hidden) -->
             <div id="quiz-section" style="display: none;">
-                <!-- This will be populated by whitelist.js -->
+                <!-- Quiz content will be loaded by whitelist.js -->
             </div>
         </div>
     </div>
@@ -33,29 +31,32 @@
     <script>
         function loginWithDiscord() {
             const clientId = '1238809630008938496';
-            const redirectUri = 'https://benjy244.github.io/Omerta-roleplay/whitelist.html';
+            const redirectUri = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
             
-            try {
-                const url = 'https://discord.com/oauth2/authorize' +
-                    '?client_id=' + clientId +
-                    '&redirect_uri=' + encodeURIComponent(redirectUri) +
-                    '&response_type=token' +
-                    '&scope=identify%20guilds.join';
-                
-                console.log('Redirect URL:', redirectUri); // For debugging
-                window.location.href = url;
-            } catch (error) {
-                console.error('Login error:', error);
-                showError('An error occurred during login. Please try again.');
-            }
+            const params = new URLSearchParams({
+                client_id: clientId,
+                redirect_uri: redirectUri,
+                response_type: 'token',
+                scope: 'identify',
+                prompt: 'consent'
+            });
+
+            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
         }
 
         window.onload = async function() {
             try {
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    const accessToken = new URLSearchParams(hash).get('access_token');
-                    if (accessToken) {
+                const fragment = new URLSearchParams(window.location.hash.slice(1));
+                const accessToken = fragment.get('access_token');
+                const error = fragment.get('error');
+
+                if (error) {
+                    showError('Authentication failed. Please try again.');
+                    return;
+                }
+
+                if (accessToken) {
+                    try {
                         const response = await fetch('https://discord.com/api/users/@me', {
                             headers: {
                                 'Authorization': `Bearer ${accessToken}`
@@ -63,29 +64,30 @@
                         });
 
                         if (!response.ok) {
-                            throw new Error('Failed to get user data');
+                            throw new Error('Failed to fetch user data');
                         }
 
                         const userData = await response.json();
                         console.log('Logged in as:', userData.username);
                         
-                        // Hide login section
+                        // Hide login section and show quiz
                         document.getElementById('login-section').style.display = 'none';
-                        
-                        // Show quiz section
                         document.getElementById('quiz-section').style.display = 'block';
                         
-                        // Start the quiz from whitelist.js
+                        // Start the quiz if the function exists in whitelist.js
                         if (typeof startQuiz === 'function') {
                             startQuiz();
                         } else {
-                            console.error('startQuiz function not found. Make sure whitelist.js is loaded properly.');
+                            console.error('startQuiz function not found in whitelist.js');
                         }
+                    } catch (error) {
+                        console.error('Error fetching user data:', error);
+                        showError('Failed to get user data. Please try again.');
                     }
                 }
             } catch (error) {
-                console.error('Authentication error:', error);
-                showError('Failed to authenticate. Please try again.');
+                console.error('Auth error:', error);
+                showError('An error occurred. Please try again.');
             }
         };
 
