@@ -570,73 +570,43 @@ function handleAnswer(questionIndex, answerIndex) {
 }
 
 async function submitQuiz() {
-    const score = userAnswers.reduce((acc, answer, index) => 
-        answer === questions[index].correct ? acc + 1 : acc, 0);
-    
-    const passed = score >= REQUIRED_SCORE;
-    
-    // Hide quiz section
-    document.getElementById('quiz-section').style.display = 'none';
-    
-    // Clear any previous results
-    document.getElementById('success-result').style.display = 'none';
-    document.getElementById('fail-result').style.display = 'none';
-    
-    if (passed) {
+    const score = calculateScore(); // Your existing score calculation
+    const passingScore = questions.length * 0.8; // 80% passing threshold
+
+    if (score >= passingScore) {
         try {
-            const response = await fetch('http://digi.pylex.xyz:9990/add-role', {
+            // Get the user's Discord ID from localStorage or wherever you store it
+            const userId = localStorage.getItem('discord_user_id');
+            
+            const response = await fetch('https://digi.pylex.xyz:9990:9990/add-role', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    userId: currentUserId
-                })
+                body: JSON.stringify({ userId: userId })
             });
-
-            if (!response.ok) {
-                throw new Error('Server responded with status: ' + response.status);
-            }
 
             const data = await response.json();
 
-            if (!data.success) {
+            if (data.success) {
+                displayMessage('Congratulations! You passed the test and received the role!', 'success');
+            } else {
                 throw new Error(data.error || 'Failed to assign role');
             }
-
-            // Show only success message
-            document.getElementById('success-result').style.display = 'block';
-            document.getElementById('result-section').style.display = 'block';
-            
-            // Update status displays
-            document.querySelector('.status-value').textContent = 'VERIFIED';
-            document.querySelector('.role-value').textContent = 'DODIJELJENA';
-            
         } catch (error) {
-            console.error('Role assignment error:', error);
-            
-            // Show success but with error message
-            document.getElementById('success-result').style.display = 'block';
-            document.getElementById('result-section').style.display = 'block';
-            
-            // Update error message
-            const errorBox = document.createElement('div');
-            errorBox.className = 'error-box';
-            errorBox.innerHTML = `
-                <div class="error-content">
-                    <p>Test je položen, ali došlo je do greške pri dodjeljivanju uloge.</p>
-                    <p>Greška: ${error.message}</p>
-                    <p>Molimo kontaktirajte administratora.</p>
-                </div>
-            `;
-            
-            document.getElementById('success-result').appendChild(errorBox);
+            console.error('Error:', error);
+            displayMessage('Test je položen, ali došlo je do greške pri dodjeljivanju uloge.\n\nGreška: ' + error.message + '\n\nMolimo kontaktirajte administratora.', 'error');
         }
     } else {
-        // Show only fail message
-        document.getElementById('fail-result').style.display = 'block';
-        document.getElementById('result-section').style.display = 'block';
+        displayMessage('You did not pass the test. Please try again.', 'error');
     }
+}
+
+function displayMessage(message, type) {
+    const resultDiv = document.getElementById('quiz-results');
+    resultDiv.textContent = message;
+    resultDiv.className = type;
+    resultDiv.style.display = 'block';
 }
 
 // Add some CSS for better error display
