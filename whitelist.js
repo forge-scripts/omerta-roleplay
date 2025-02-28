@@ -1,6 +1,6 @@
 const DISCORD_CLIENT_ID = '1238809630008938496';
 const DISCORD_REDIRECT_URI = 'https://benjy244.github.io/omerta-roleplay/whitelist.html';
-const API_ENDPOINT = 'http://digi.pylex.xyz:9990';
+const API_ENDPOINT = 'https://digi.pylex.xyz:9990';
 
 const questions = [
     {
@@ -374,43 +374,53 @@ window.handleAnswer = function(questionIndex, answerIndex) {
 
 // Check for authentication response on page load
 window.addEventListener('load', async () => {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get('access_token');
-    const error = fragment.get('error');
-    
-    if (error) {
-        console.error('Discord auth error:', error);
-        showError('Authentication failed. Please try again.');
-        document.getElementById('login-section').style.display = 'block';
-        return;
-    }
-    
-    if (accessToken) {
-        try {
-            const userResponse = await fetch('https://discord.com/api/users/@me', {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
+    try {
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get('access_token');
+        const error = fragment.get('error');
+        
+        if (error) {
+            console.error('Discord auth error:', error);
+            showError('Authentication failed. Please try again.');
+            document.getElementById('login-section').style.display = 'block';
+            return;
+        }
+        
+        if (accessToken) {
+            try {
+                // Test the token first
+                console.log('Attempting to verify token...');
+                
+                const userResponse = await fetch('https://discord.com/api/users/@me', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error(`Discord API error: ${userResponse.status}`);
                 }
-            });
 
-            if (!userResponse.ok) {
-                throw new Error(`HTTP error! status: ${userResponse.status}`);
+                const userData = await userResponse.json();
+                currentUserId = userData.id;
+                console.log('Successfully authenticated user:', userData.username);
+
+                // Skip cooldown check for now and start quiz directly
+                startQuiz();
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showError('Failed to authenticate. Please try again.');
+                document.getElementById('login-section').style.display = 'block';
             }
-
-            const userData = await userResponse.json();
-            currentUserId = userData.id;
-            console.log('Successfully authenticated user:', userData.username);
-            
-            // Start quiz immediately after successful auth
-            startQuiz();
-        } catch (error) {
-            console.error('Authentication error:', error);
-            showError('Failed to authenticate. Please try again.');
+        } else {
+            // No access token, show login
             document.getElementById('login-section').style.display = 'block';
         }
-    } else {
-        // No access token, show login
+    } catch (error) {
+        console.error('Critical error:', error);
+        showError('An unexpected error occurred. Please try again.');
         document.getElementById('login-section').style.display = 'block';
     }
 });
@@ -426,12 +436,57 @@ function showCooldown(remainingTime) {
         `${hours}h ${minutes}m`;
 }
 
-document.getElementById('submitQuiz')?.addEventListener('click', async () => {
+async function submitQuiz() {
     const score = userAnswers.reduce((acc, answer, index) => 
         answer === questions[index].correct ? acc + 1 : acc, 0);
     
     const passed = score >= REQUIRED_SCORE;
     
+    try {
+        // Show results immediately
+        document.getElementById('quiz-section').style.display = 'none';
+        
+        if (passed) {
+            document.getElementById('success-result').style.display = 'block';
+            document.getElementById('fail-result').style.display = 'none';
+        } else {
+            document.getElementById('success-result').style.display = 'none';
+            document.getElementById('fail-result').style.display = 'block';
+        }
+
+        // Try to send results to API
+        const response = await fetch(`${API_ENDPOINT}/assign-role`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: currentUserId,
+                passed: passed
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update role status');
+        }
+
+    } catch (error) {
+        console.error('Error in submit:', error);
+        // Show error but don't block the results
+        showError('Role assignment may have failed. Please contact an administrator.');
+    }
+}
+
+// Add this helper function to check if the API is available
+async function checkApiAvailability() {
+    try {
+        const response = await fetch(`${API_ENDPOINT}/health`);
+        return response.ok;
+    } catch (error) {
+        console.error('API check failed:', error);
+        return false;
+    }
+}
     document.getElementById('quiz-section').classList.remove('active');
     document.getElementById('result-section').classList.add('active');
     
