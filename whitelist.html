@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMERTA RP - Whitelist</title>
+    <!-- Include your existing styles first -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Then add whitelist specific styles -->
+    <link rel="stylesheet" href="whitelist-styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Include your existing navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://cdn.discordapp.com/attachments/1246445471145136238/1344651535409483806/OmertaProPng.png?ex=67c1afd4&is=67c05e54&hm=ec502be8c1895a64d45995663bef56e5923e8ca98c6d531a384d12a1aa4c9534&" alt="OMERTA RP Logo" class="nav-logo">
+            <span class="server-name">OMERTA RP</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i data-lucide="home"></i>Početna</a>
+            <a href="index.html#features"><i data-lucide="layers"></i>Značajke</a>
+            <a href="index.html#rules"><i data-lucide="shield"></i>Pravila</a>
+            <a href="index.html#discord"><i data-lucide="users"></i>Zajednica</a>
+            <a href="whitelist.html" class="active"><i data-lucide="check-circle"></i>Whitelist</a>
+            <a href="donations.html" class="nav-donate"><i data-lucide="heart"></i>Donacije</a>
+        </div>
+        <div class="nav-toggle">
+            <i data-lucide="menu"></i>
+        </div>
+    </nav>
+
+    <div class="whitelist-container">
+        <div class="whitelist-box">
+            <div id="login-section" class="whitelist-section active">
+                <h2>Whitelist Pristup</h2>
+                <p>Prijavite se svojim Discord računom za pristup whitelistu</p>
+                <button onclick="loginWithDiscord()" id="discordLoginBtn" class="discord-auth-btn">
+                    <i data-lucide="message-square"></i>
+                    Prijavi se preko Discorda
+                </button>
+            </div>
+            
+            <div id="quiz-section" class="whitelist-section">
+                <h2>Roleplay Kviz</h2>
+                <p>Odgovorite točno na sljedeća pitanja za pristup serveru</p>
+                <div id="quiz-container"></div>
+                <button id="submitQuiz" class="submit-quiz-btn" disabled>
+                    Predaj Odgovore
+                </button>
+            </div>
+            
+            <div id="result-section" class="whitelist-section">
+                <div id="success-result" class="result-box">
+                    <i data-lucide="check-circle"></i>
+                    <h3>Čestitamo!</h3>
+                    <p>Uspješno ste prošli whitelist. Vaša Discord uloga je dodijeljena.</p>
+                </div>
+                <div id="fail-result" class="result-box">
+                    <i data-lucide="x-circle"></i>
+                    <h3>Pokušajte Ponovno</h3>
+                    <p>Niste prošli whitelist. Molimo proučite pravila i pokušajte ponovno za 24 sata.</p>
+                </div>
+            </div>
+
+            <div id="cooldown-section" class="whitelist-section">
+                <div class="cooldown-box">
+                    <i data-lucide="clock" class="cooldown-icon"></i>
+                    <h3>Molimo pričekajte</h3>
+                    <p>Niste prošli whitelist test.</p>
+                    <p id="cooldown-timer" class="cooldown-timer"></p>
+                    <p>Proučite pravila i pokušajte ponovno kada vrijeme istekne.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include your existing footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i data-lucide="cpu"></i> OMERTA_RP</h3>
+                <p>Nova Generacija Roleplay Iskustva</p>
+            </div>
+            <div class="footer-section">
+                <h3><i data-lucide="link"></i> Navigacija</h3>
+                <a href="index.html">Početna</a>
+                <a href="index.html#features">Značajke</a>
+                <a href="index.html#rules">Pravila</a>
+                <a href="index.html#discord">Zajednica</a>
+            </div>
+            <div class="footer-section">
+                <h3><i data-lucide="share-2"></i> Povezivanje</h3>
+                <div class="social-links">
+                    <a href="https://discord.gg/your-discord" target="_blank"><i data-lucide="message-square"></i></a>
+                    <a href="https://twitter.com/your-twitter" target="_blank"><i data-lucide="twitter"></i></a>
+                    <a href="https://youtube.com/your-youtube" target="_blank"><i data-lucide="youtube"></i></a>
+                    <a href="https://tiktok.com/@your-tiktok" target="_blank"><i data-lucide="video"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 OMERTA_RP // Status Sustava: Online</p>
+        </div>
+    </footer>
+
+    <script src="whitelist.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html> 
